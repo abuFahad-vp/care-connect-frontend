@@ -278,11 +278,7 @@
 	{#if formData.expanded}
         {#if formData.isAccepted}
             <div class="profile-view">
-                <img src={displayImage(formData.partner_profile.profile_image)} class="dp" alt="Profile_Image" />
-                <p class="name"><strong> {formData.partner_profile.full_name} </strong></p>
-                <div class="modal-button">
-                    <ProfileViewModal formData={formData.partner_profile}/>
-                </div>
+                <ProfileViewModal formData={formData.partner_profile}/>
             </div>
         {/if}
 		<div class="full-content" transition:slide={{ duration: 300 }}>

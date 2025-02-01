@@ -138,8 +138,6 @@
         </Modal>
         <div class="full-content" transition:slide={{ duration: 300 }}>
         <div class="profile-view">
-            <img src={displayImage(partner_profile.profile_image)} class="dp" alt="Profile_Image" />
-            <p class="name"><strong> {partner_profile.full_name} </strong></p>
             <div class="modal-button">
                 <ProfileViewModal formData={partner_profile}/>
             </div>
@@ -368,13 +366,6 @@
 		z-index: 2;
         scroll-behavior: unset;
 	}
-    .full-content img {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        object-fit: cover;
-        flex-shrink: 0;
-    }
 
     .styled-button {
         background-color: #007BFF;

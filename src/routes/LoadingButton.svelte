@@ -14,7 +14,7 @@
   type={type}
 >
   {#if isLoading}
-    <LoadingSpinner color="#ffffff"/>
+    <LoadingSpinner thickness_needle="0.1rem" thickness_outer="0.1rem" color="#ffffff"/>
   {:else}
     {content}
   {/if}
