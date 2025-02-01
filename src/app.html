@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%sveltekit.assets%/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+    <style>
+        @font-face {
+          font-family: 'Inter';
+          src: url('%sveltekit.assets%/fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype');
+          font-weight: 100 900;
+        }
+        :root {
+          --border-color: #93b38a;
+          --primary-color: #035257;
+          --secondary-color: rgb(59, 156, 145);
+          --bg-color: #4f9fd2;
+        }
+      </style>
+        <title>Tauri + SvelteKit App</title>
+        %sveltekit.head%
+      </head>
+      <body data-sveltekit-preload-data="hover">
+        <div style="display: contents">%sveltekit.body%</div>
+      </body>
+    </html>
