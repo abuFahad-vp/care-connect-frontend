@@ -6,6 +6,13 @@ export let record_contract = $state({
     is_requesting: false,
 })
 
+export interface recordForm {
+    title: string,
+    value: string,
+    remarks: string,
+    unit: string
+}
+
 export async function unassign() {
 
     record_contract.is_assigned = false;

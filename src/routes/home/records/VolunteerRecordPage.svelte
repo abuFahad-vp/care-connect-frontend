@@ -1,13 +1,64 @@
 <script lang="ts">
-    import { Button } from "flowbite-svelte";
+    import { Button, Input, Label } from "flowbite-svelte";
     import { user_data } from "../../user.svelte";
     import ProfileView from "../ProfileView.svelte";
-    import { record_contract, unassign } from "./recordData.svelte";
+    import { record_contract, unassign, type recordForm } from "./recordData.svelte";
     import { displayImage } from "../util.svelte";
     
     let newRequestProfile = $state({} as any);
     let isNewRequest = $state(false);
     let showProfile = $state(false);
+
+    let record_form: recordForm[] = $state([
+        {
+            title: "Weight",
+            value: "",
+            remarks: "",
+            unit: "kg",
+        },
+        {
+            title: "Height",
+            value: "",
+            remarks: "",
+            unit: "cm",
+        },
+        {
+            title: "Blood pressure",
+            value: "",
+            remarks: "",
+            unit: "mmHg"
+        },
+        {
+            title: "Heart rate",
+            value: "",
+            remarks: "",
+            unit: "bpm"
+        },
+        {
+            title: "Body temperature",
+            value: "",
+            remarks: "",
+            unit: "°F"
+        },
+        {
+            title: "Oxygen saturation",
+            value: "",
+            remarks: "",
+            unit: "SpO₂%"
+        },
+        {
+            title: "Blood glucose",
+            value: "",
+            remarks: "",
+            unit: "mg/dL"
+        },
+        {
+            title: "Respiratory rate",
+            value: "",
+            remarks: "",
+            unit: "breaths per minute"
+        },
+    ]);
 
     user_data.websocket.addListener((msg) => {
         if (msg.type == "Text") {
@@ -20,6 +71,28 @@
             }
         }
     })
+
+    async function updateRecord() {
+        try {
+            let formData = new FormData();
+            formData.append("data", JSON.stringify(record_form));
+            let response = await fetch(`${user_data.serverURL}/volunteer/update_record`, {
+                method: "POST",
+                headers: {
+                    'accept': 'application/x-www-form-urlencoded',
+                    'Authorization': `Bearer ${user_data.sessionToken}`
+                },
+                body: formData
+            });
+            if (response.ok) {
+                console.log("DONE");
+            } else {
+                console.log("Failed to update the record");
+            }
+        } catch (e: any) {
+            console.log("Error: ", e);
+        }
+    }
 
     function acceptRequest() {
         let decision = `new_volunteer_request:accept:${newRequestProfile.email}`
@@ -70,6 +143,18 @@
             {/if}
         </div>
         <div class="record-form" style="background-color: white; border-radius: 20px; padding: 20px; margin-top: 10px">
+            <form>
+                {#each record_form as field (field.title)}
+                    <Label>{`${field.title} (${field.unit})`}</Label>
+                    <div style="margin: 5px;">
+                        <Input type="text" placeholder={`Enter the ${field.title}`} bind:value={field.value}></Input>
+                    </div>
+                    <div style="margin: 5px; margin-bottom: 10px">
+                        <Input type="text" placeholder={`Enter the remarks on ${field.title}`} bind:value={field.remarks}></Input>
+                    </div>
+                {/each}
+                <Button onclick={updateRecord}>Update</Button>
+            </form>
         </div>
     {:else if isNewRequest}
         <div class="new-request">
