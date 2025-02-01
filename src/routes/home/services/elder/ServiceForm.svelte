@@ -10,10 +10,7 @@
     import { Button, Modal, Input } from 'flowbite-svelte'
     import { ExclamationCircleOutline } from 'flowbite-svelte-icons';
     import { displayImage, formatDateTime, formatMilliseconds } from '../../util.svelte';
-<<<<<<< HEAD
     import ProfileViewModal from '../../ProfileViewModal.svelte';
-=======
->>>>>>> 5b65280 (core completed)
 
     let { formData, id }: {
 		formData: service_form
@@ -508,11 +505,7 @@
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div class="card-container" onclick={expandOrCollapse}>
                 <div class="card">
-<<<<<<< HEAD
                     {#if formData.status !== "pending"}
-=======
-                    {#if formData.status === "accepted"}
->>>>>>> 5b65280 (core completed)
                         <img src={displayImage(formData.partner_profile.profile_image)} class="dp" alt="profile_image" />
                     {/if}
                     <div class="card-header">
@@ -800,7 +793,6 @@
             height: 60px;
         }
     }
-<<<<<<< HEAD
 
     .profile-view {
         display: flex;
@@ -809,6 +801,4 @@
         align-items: center;
         padding-top: 20px;
     }
-=======
->>>>>>> 5b65280 (core completed)
 </style>

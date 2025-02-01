@@ -8,7 +8,7 @@ export const user_data = $state({
     serverIP: "",
     serverURL: "",
     file: undefined as any,
-    websocket: new WebSocket(0,[]),
+    websocket: new WebSocket(0, [] as any),
     data: {
       user_type: '',
       full_name: '',
@@ -90,10 +90,6 @@ export async function login(email: string, password: string, redirect: string, f
       }
 
       const contents = JSON.stringify(data.data);
-      await writeTextFile('data.txt', contents, {
-        baseDir: BaseDirectory.AppConfig,
-      });
-
     } else {
 
       const error = await response.json();

@@ -5,6 +5,7 @@
   "windows": [
     "main"
   ],
+
   "permissions": [
     "core:default",
     "opener:default",
@@ -12,32 +13,7 @@
     "core:image:allow-from-path",
     "core:image:allow-from-bytes",
     "store:default",
-    "fs:default",
-    {
-      "identifier": "fs:allow-exists",
-      "allow": [
-        {
-          "path": "$APPDATA/*"
-        }
-      ]
-    },
-    {
-      "identifier": "fs:allow-read",
-      "allow": [
-        {
-          "path": "$APPDATA/*"
-        }
-      ]
-    },
-    {
-      "identifier": "fs:allow-write",
-      "allow": [
-        {
-          "path": "$APPDATA/*"
-        }
-      ]
-    },
     "websocket:default",
-    "websocket:default"
+    "fs:default"
   ]
 }
