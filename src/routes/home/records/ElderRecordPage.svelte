@@ -1,12 +1,55 @@
 <script lang="ts">
-    import { Button } from "flowbite-svelte";
-    import { getPartner, record_contract, unassign } from "./recordData.svelte";
+    import { Button, Input, Label } from "flowbite-svelte";
+    import { getPartner, record_contract, unassign, type recordForm } from "./recordData.svelte";
     import LoadingSpinner from "../../LoadingSpinner.svelte";
     import { sleep, user_data } from "../../user.svelte";
     import ProfileView from "../ProfileView.svelte";
     import { displayImage } from "../util.svelte";
+    import { onMount } from "svelte";
 
     let showProfile = $state(false);
+    let record_form = $state([] as recordForm[]);
+
+    user_data.websocket.addListener(async (msg) => {
+        if (msg.type === "Text") {
+            const incomingData = JSON.parse(msg.data)
+            if (incomingData.type === "volunteer_service") {
+                if (incomingData.message === "record_updated") {
+                    try {
+                        await getRecord();
+                    } catch (e: any) {
+                        console.log("ERROR: ", e)
+                    }
+                }
+            }
+        }
+    })
+
+    onMount(async () => {
+        try {
+            await getRecord();
+        } catch (e: any) {
+            console.log("ERROR: ", e);
+        }
+    })
+
+    async function getRecord() {
+        try {
+            let response = await fetch(`${user_data.serverURL}/elder/record`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${user_data.sessionToken}`
+                },
+            });
+            if (response.ok) {
+                let responseData = await response.json();
+                record_form = JSON.parse(responseData.data);
+                console.log(record_form[0]);
+            }
+        } catch (e: any) {
+            console.log("ERROR: ", e);
+        }
+    }
 
     async function startVolunteerRequest() {
         let response = await fetch(`${user_data.serverURL}/elder/new_volunteer_request`, {
@@ -64,7 +107,18 @@
                 </div>
             {/if}
         </div>
-        <div class="record-form">
+        <div class="record-form" style="background-color: white; border-radius: 20px; padding: 20px; margin-top: 10px">
+            <form>
+                {#each record_form as field (field.title)}
+                    <Label>{`${field.title} (${field.unit})`}</Label>
+                    <div style="margin: 5px;">
+                        <Input readonly={true} type="text" placeholder={`${field.title}`} bind:value={field.value}></Input>
+                    </div>
+                    <div style="margin: 5px; margin-bottom: 10px">
+                        <Input readonly={true} type="text" placeholder={`remarks on ${field.title}`} bind:value={field.remarks}></Input>
+                    </div>
+                {/each}
+            </form>
         </div>
     {:else if record_contract.is_requesting}
         <div class="request-loading">

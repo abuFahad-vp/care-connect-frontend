@@ -7,6 +7,7 @@ export const user_data = $state({
     searchingIP: false,
     serverIP: "",
     serverURL: "",
+    myIP: "",
     file: undefined as any,
     websocket: new WebSocket(0, [] as any),
     data: {
@@ -55,6 +56,12 @@ export async function login(email: string, password: string, redirect: string, f
     formData.append("username", email);
     formData.append("password", password);
     let response: any;
+
+    if (user_data.serverIP === "") {
+        return_response.error_msg = "Network error"
+        return return_response;
+    }
+
     if (fetch_custom) {
       response = await fetch_custom(`http://${user_data.serverIP}:8000/token`, {
         method: "POST",
@@ -112,6 +119,7 @@ export async function get_server_ip() {
     user_data.searchingIP = true;
 
     const my_ip: string = await invoke('get_ip');
+    user_data.myIP = my_ip;
     const gateway = my_ip.split(".").slice(0, 3).join('.');
 
     const ips = Array.from({ length: 250 }, (_, i) => `${gateway}.${i}`);

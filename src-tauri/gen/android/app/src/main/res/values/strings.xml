@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">care-connect-frontend</string>
-    <string name="main_activity_title">care-connect-frontend</string>
+    <string name="app_name">care-connect</string>
+    <string name="main_activity_title">care-connect</string>
 </resources>

@@ -44,6 +44,28 @@
     }, 1000);
 
     onMount(() => {
+
+        const inputsAndTextareas = document.querySelectorAll('input, textarea');
+        const form = document.querySelector('form');
+
+        inputsAndTextareas.forEach(element => {
+            element.addEventListener('focus', () => {
+                // Add temporary padding to the body to make space for the keyboard
+                document.body.style.paddingBottom = '300px';
+
+                setTimeout(() => {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300); // Delay for keyboard animation
+            });
+
+            element.addEventListener('blur', () => {
+                // Remove the extra padding when the element loses focus
+                document.body.style.paddingBottom = '0';
+            });
+        });
+    });
+
+    onMount(() => {
         const inputsAndTextareas = document.querySelectorAll('input, textarea');
 
         inputsAndTextareas.forEach(element => {
@@ -321,11 +343,15 @@
                 <div class="form-group">
                     <!-- svelte-ignore a11y_label_has_associated_control -->
                     <label>Documents</label>
-                    <input 
-                        type="file" 
-                        multiple 
+                    <label class="cursor-pointer flex items-center gap-2 px-4 py-2 bg-teal-800 text-white rounded-lg hover:bg-teal-900">
+                    📂 Choose File
+                    <input
+                        type="file"
+                        multiple
+                        class="hidden"
                         onchange={handleDocumentUpload}
                     />
+                    </label>
                     {#if formData.documents.length > 0}
                         <div class="uploaded-files">
                             <div class="document-column">

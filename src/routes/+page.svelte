@@ -26,6 +26,7 @@ import { login, user_data } from './user.svelte';
     error_msg = response?.error_msg as string;
     isLoading = false;
   }
+  let showIPInput = $state(false);
 </script>
 
 <main>
@@ -34,6 +35,13 @@ import { login, user_data } from './user.svelte';
   <div class="background1"></div>
   <div class="background2"></div>
   <div class="banner">
+  {#if showIPInput}
+  <input type="text" bind:value={user_data.myIP}>
+  <input type="text" bind:value={user_data.serverIP}>
+  <button onclick={() => showIPInput = false}>close</button>
+  {:else}
+  <button onclick={() => showIPInput = true}>.</button>
+  {/if}
     <img src="/images/care-connect-logo.png" class="logo" alt="CareConnect Logo" />
     <h1 class="title">Welcome to CareConnect!</h1>
   </div>

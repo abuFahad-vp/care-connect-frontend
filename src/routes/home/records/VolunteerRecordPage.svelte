@@ -1,13 +1,38 @@
 <script lang="ts">
-    import { Button, Input, Label } from "flowbite-svelte";
+    import { Button, Input, Label, Modal } from "flowbite-svelte";
     import { user_data } from "../../user.svelte";
     import ProfileView from "../ProfileView.svelte";
     import { record_contract, unassign, type recordForm } from "./recordData.svelte";
     import { displayImage } from "../util.svelte";
+    // import { ExclamationCircleOutline } from "flowbite-svelte-icons";
+    import { onMount } from "svelte";
     
     let newRequestProfile = $state({} as any);
     let isNewRequest = $state(false);
     let showProfile = $state(false);
+    let showUpdatedModal = $state(false);
+
+    onMount(() => {
+
+        const inputsAndTextareas = document.querySelectorAll('input, textarea');
+        const form = document.querySelector('form');
+
+        inputsAndTextareas.forEach(element => {
+            element.addEventListener('focus', () => {
+                // Add temporary padding to the body to make space for the keyboard
+                document.body.style.paddingBottom = '300px';
+
+                setTimeout(() => {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300); // Delay for keyboard animation
+            });
+
+            element.addEventListener('blur', () => {
+                // Remove the extra padding when the element loses focus
+                document.body.style.paddingBottom = '0';
+            });
+        });
+    });
 
     let record_form: recordForm[] = $state([
         {
@@ -85,6 +110,7 @@
                 body: formData
             });
             if (response.ok) {
+                showUpdatedModal = true;
                 console.log("DONE");
             } else {
                 console.log("Failed to update the record");
@@ -153,6 +179,9 @@
                         <Input type="text" placeholder={`Enter the remarks on ${field.title}`} bind:value={field.remarks}></Input>
                     </div>
                 {/each}
+                {#if showUpdatedModal}
+                <p style="color: green; padding: 5px"><strong>Record successfully updated</strong></p>
+                {/if}
                 <Button onclick={updateRecord}>Update</Button>
             </form>
         </div>

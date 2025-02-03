@@ -73,29 +73,35 @@
         pageData.serviceRequestsArray = pageData.serviceRequestsArray.filter((req,_) => req.service_form.service_id !== service_form.service_id);
     }
 
-    async function fetchDocument(service_id: string, document_any: any) {
-        const response = await fetch(`${user_data.serverURL}/volunteer/get_documents/${service_id}/${document_any}`, {
-            method: 'GET',
-			headers: {
-				'accept': 'application/json',
-				'Authorization': `Bearer ${user_data.sessionToken}`
-			},
-        });
+    // async function fetchDocument(service_id: string, document_any: any) {
+    //     // let response = window.open(`${user_data.serverURL}/volunteer/get_documents/${service_id}/${document_any}`, "_blank");
+    //     // console.log(response);
 
-        if (!response.ok) {
-            console.error("Failed to download file");
-            return
-        }
+    //     const response = await fetch(`${user_data.serverURL}/volunteer/get_documents/${service_id}/${document_any}`, {
+    //         method: 'GET',
+	// 		headers: {
+	// 			'accept': 'application/json',
+	// 			'Authorization': `Bearer ${user_data.sessionToken}`
+	// 		},
+    //     });
 
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = document_any;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    }
+    //     if (!response.ok) {
+    //         console.error("Failed to download file");
+    //         return
+    //     }
+
+    //     const blob = await response.blob();
+    //     const url = window.URL.createObjectURL(blob);
+    //     window.open(url, "_blank");
+    //     // const a = document.createElement('a');
+    //     // a.href = url;
+    //     // a.target = "_blank";
+    //     // a.download = document_any;
+    //     // document.body.appendChild(a);
+    //     // window.open(a, "_system");
+    //     // // a.click();
+    //     // document.body.removeChild(a);
+    // }
 
 	function expandOrCollapse() {
         pageData.serviceRequestsArray.forEach((request) => {
@@ -155,9 +161,7 @@
                 {#each service_form.documents as document}
                     <li>
                         <!-- svelte-ignore a11y_invalid_attribute -->
-                        <a href="#" onclick={(e) => {e.preventDefault(); fetchDocument(service_form.service_id, document)}}>
-                            {document}
-                        </a>
+                        <a target="_blank" href={`${user_data.serverURL}/volunteer/get_documents/${service_form.service_id}/${document}?token=${user_data.sessionToken}`}>{document}</a>
                     </li>
                 {/each}
             
