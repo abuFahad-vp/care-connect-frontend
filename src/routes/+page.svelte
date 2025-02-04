@@ -18,7 +18,14 @@ import { login, user_data } from './user.svelte';
     let username = formData.get("username") as string;
     let password = formData.get("password") as string;
 
-    const response = await login(username, password, "/home");
+    let redirect;
+    if (username === "admin@admin.com") {
+      redirect = "/admin"
+    } else {
+      redirect = "/home"
+    }
+
+    const response = await login(username, password, redirect);
     if (response?.result) {
       console.log("Successfully logged");
       return
