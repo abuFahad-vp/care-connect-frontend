@@ -3,9 +3,10 @@
     import { user_data } from "../../user.svelte";
     import ProfileView from "../ProfileView.svelte";
     import { record_contract, unassign, type recordForm } from "./recordData.svelte";
-    import { displayImage } from "../util.svelte";
+    import { displayImage, reportUser } from "../util.svelte";
     // import { ExclamationCircleOutline } from "flowbite-svelte-icons";
     import { onMount } from "svelte";
+    import ReportModal from "../../ReportModal.svelte";
     
     let newRequestProfile = $state({} as any);
     let isNewRequest = $state(false);
@@ -141,6 +142,15 @@
         console.log(`Response sent for request ${newRequestProfile.email}: ${decision}`);
         isNewRequest = false;
     }
+
+    async function reportPartner(msg: string): Promise<string> {
+        let status = await reportUser(msg, record_contract.partner_profile.email, "Weekend service");
+        if (status) {
+            return `Successfully reported the ${record_contract.partner_profile.user_type}`
+        } else {
+            return `Failed to report the ${record_contract.partner_profile.user_type}`
+        }
+    }
 </script>
 
 <main class="main-container">
@@ -164,6 +174,9 @@
                     </div>
                     <div class="unassign-button">
                         <Button size="xs" onclick={() => {isNewRequest = false; unassign()}} color="red">Unassign</Button>
+                    </div>
+                    <div>
+                        <ReportModal fn={reportPartner} color="dark" size="xs"/>
                     </div>
                 </div>
             {/if}

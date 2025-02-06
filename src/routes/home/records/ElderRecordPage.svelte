@@ -4,8 +4,9 @@
     import LoadingSpinner from "../../LoadingSpinner.svelte";
     import { sleep, user_data } from "../../user.svelte";
     import ProfileView from "../ProfileView.svelte";
-    import { displayImage } from "../util.svelte";
+    import { displayImage, reportUser } from "../util.svelte";
     import { onMount } from "svelte";
+    import ReportModal from "../../ReportModal.svelte";
 
     let showProfile = $state(false);
     let record_form = $state([] as recordForm[]);
@@ -44,7 +45,7 @@
             if (response.ok) {
                 let responseData = await response.json();
                 record_form = JSON.parse(responseData.data);
-                console.log(record_form[0]);
+                // console.log(record_form[0]);
             }
         } catch (e: any) {
             console.log("ERROR: ", e);
@@ -80,6 +81,14 @@
         }
     }
 
+    async function reportPartner(msg: string): Promise<string> {
+        let status = await reportUser(msg, record_contract.partner_profile.email, "Weekend service");
+        if (status) {
+            return `Successfully reported the ${record_contract.partner_profile.user_type}`
+        } else {
+            return `Failed to report the ${record_contract.partner_profile.user_type}`
+        }
+    }
 </script>
 
 <main class="main-container">
@@ -103,6 +112,12 @@
                     </div>
                     <div class="unassign-button">
                         <Button size="xs" onclick={() => {unassign()}} color="red">Unassign</Button>
+                    </div>
+                    <!-- <div class="unassign-button">
+                        <Button size="xs" onclick={() => {unassign()}} color="red">Unassign</Button>
+                    </div> -->
+                    <div>
+                        <ReportModal fn={reportPartner} color="dark" size="xs"/>
                     </div>
                 </div>
             {/if}

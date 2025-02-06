@@ -17,6 +17,7 @@
     "@tauri-apps/plugin-fs": "^2.2.0",
     "@tauri-apps/plugin-opener": "^2",
     "@tauri-apps/plugin-websocket": "^2.3.0",
+    "fuse.js": "^7.1.0",
     "libphonenumber-js": "^1.11.19"
   },
   "devDependencies": {

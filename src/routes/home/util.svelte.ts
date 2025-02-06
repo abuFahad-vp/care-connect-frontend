@@ -1,3 +1,5 @@
+import { user_data } from "../user.svelte";
+
 function detectImageFormat(base64String: string) {
     const data = base64String.startsWith('data:') 
       ? base64String.split(',')[1] 
@@ -110,4 +112,29 @@ export function formatMilliseconds(ms: number) {
     }
 
     return `${ms} ms`;
+}
+
+export async function reportUser(msg: string, reported_email: string, feedback_type: string): Promise<boolean> {
+    try {
+        let formData = new FormData();
+        formData.append("reported_email", reported_email);
+        formData.append("feedback", msg),
+        formData.append("feedback_type", feedback_type)
+
+        let response = await fetch(`${user_data.serverURL}/user/feedback`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${user_data.sessionToken}`
+            },
+            body: formData
+        });
+        console.log("Feedback response:", response);
+        if (response.ok) {
+          return true;
+        }
+        return false
+    } catch (e: any) {
+      console.log("ERROR:", e);
+      return false
+    }
 }
