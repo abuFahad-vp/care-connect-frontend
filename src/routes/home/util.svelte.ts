@@ -116,6 +116,9 @@ export function formatMilliseconds(ms: number) {
 
 export async function reportUser(msg: string, reported_email: string, feedback_type: string): Promise<boolean> {
     try {
+        if (msg === "") {
+          return false;
+        }
         let formData = new FormData();
         formData.append("reported_email", reported_email);
         formData.append("feedback", msg),

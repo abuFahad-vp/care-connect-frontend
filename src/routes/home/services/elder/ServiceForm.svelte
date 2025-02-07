@@ -9,8 +9,9 @@
     import { Progressbar } from 'flowbite-svelte';
     import { Button, Modal, Input } from 'flowbite-svelte'
     import { ExclamationCircleOutline } from 'flowbite-svelte-icons';
-    import { displayImage, formatDateTime, formatMilliseconds } from '../../util.svelte';
+    import { displayImage, formatDateTime, formatMilliseconds, reportUser } from '../../util.svelte';
     import ProfileViewModal from '../../ProfileViewModal.svelte';
+    import ReportModal from '../../../ReportModal.svelte';
 
     let { formData, id }: {
 		formData: service_form
@@ -46,7 +47,16 @@
     onMount(() => {
 
         const inputsAndTextareas = document.querySelectorAll('input, textarea');
-        const form = document.querySelector('form');
+
+        inputsAndTextareas.forEach(element => {
+            element.addEventListener('focus', () => {
+                pageData.isSwipable = false;
+            });
+
+            element.addEventListener('blur', () => {
+                pageData.isSwipable = true;
+            });
+        });
 
         inputsAndTextareas.forEach(element => {
             element.addEventListener('focus', () => {
@@ -64,20 +74,6 @@
             });
         });
     });
-
-    onMount(() => {
-        const inputsAndTextareas = document.querySelectorAll('input, textarea');
-
-        inputsAndTextareas.forEach(element => {
-            element.addEventListener('focus', () => {
-                pageData.isSwipable = false;
-            });
-
-            element.addEventListener('blur', () => {
-                pageData.isSwipable = true;
-            });
-        });
-    })
 
 	function expandOrCollapse() {
         service_requests.requests.forEach((request) => {
@@ -275,6 +271,13 @@
         deleteForm();
     }
 
+    async function reportPartner(msg: string): Promise<string> {
+        let status = await reportUser(msg, formData.partner_profile.email, "Normal Service Report");
+        if (status) {
+            return "Successfully reported the volunteer";
+        }
+        return "Failed to report the volunteer";
+    }
 </script>
 
 <div 
@@ -507,13 +510,15 @@
                             {/if}
                         </div>
                         <div class="form-actions">
-                            <button 
+                            <Button 
+                                size="sm"
+                                color="red"
                                 type="button" 
-                                onclick={(e) => {e.stopPropagation(); e.preventDefault(); abortModal = true}}
-                                class="btn-abort"
+                                onclick={() => {abortModal = true}}
                             >
                                 Abort
-                            </button>
+                        </Button>
+                        <ReportModal page="0%" fn={reportPartner} color="dark" size="sm"/>
                         </div>
                     {/if}
                 {/if}
@@ -717,19 +722,6 @@
         justify-content: center;
         align-items: center;
         margin-bottom: 1.5rem;
-    }
-
-    .btn-abort {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-
-
-    .btn-abort {
-        background-color: red;
-        color: white;
     }
 
     .time-status {

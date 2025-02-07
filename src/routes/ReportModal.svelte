@@ -1,9 +1,10 @@
 <script lang="ts">
     import { Button, Input, Textarea } from "flowbite-svelte";
     import { ExclamationCircleOutline } from "flowbite-svelte-icons";
-    let {color="primary", size ="xs", fn}: {
+    let {color="primary", size ="xs", fn, page}: {
         color:"primary" | "red" | "yellow" | "green" | "purple" | "blue" | "light" | "dark" | "none" | "alternative" | undefined,
         size: "xs" | "sm" | "md" | "lg" | "xl" | undefined, 
+        page: string,
         fn: ((msg: string) => Promise<string>)
     } = $props();
     let showModal = $state(false);
@@ -13,7 +14,7 @@
 
 <main>
     {#if showModal}
-        <div class="modal">
+        <div class="modal" style="left: {page};">
             <div style="color: white; display: flex; flex-direction:column; gap: 5px; margin: 7px; justify-content: center; align-items: center">
                 <ExclamationCircleOutline/>
                 <p>Report</p>
@@ -42,11 +43,11 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        position: absolute;
-        top: 0px;
-        left: 100%;
+        position: fixed;
+        top: 10%;
         width: 100%;
-        height: 80vh;
+        height: 50vh;
         background-color: rgba(0, 0, 0, 0.6);
+        z-index: 1000;
     }
 </style>

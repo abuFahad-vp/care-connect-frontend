@@ -176,7 +176,7 @@
                         <Button size="xs" onclick={() => {isNewRequest = false; unassign()}} color="red">Unassign</Button>
                     </div>
                     <div>
-                        <ReportModal fn={reportPartner} color="dark" size="xs"/>
+                        <ReportModal page="100%" fn={reportPartner} color="dark" size="xs"/>
                     </div>
                 </div>
             {/if}

@@ -1,12 +1,13 @@
 <script lang="ts">
     import { slide } from "svelte/transition";
-    import { displayImage, formatDateTime, formatMilliseconds, getTimeDifference } from "../util.svelte";
+    import { displayImage, formatDateTime, formatMilliseconds, getTimeDifference, reportUser } from "../util.svelte";
     import { pageData } from "../page_state.svelte";
     import { user_data } from "../../user.svelte";
     import LoadingSpinner from "../../LoadingSpinner.svelte";
     import { Button, Modal, Progressbar } from "flowbite-svelte";
     import { ExclamationCircleOutline } from "flowbite-svelte-icons";
     import ProfileViewModal from "../ProfileViewModal.svelte";
+    import ReportModal from "../../ReportModal.svelte";
 
     let {requestForm, id} = $props()
     let partner_profile = requestForm.elder_profile;
@@ -111,6 +112,15 @@
         });
 		requestForm.expanded = !requestForm.expanded 
 	}
+
+
+    async function reportPartner(msg: string): Promise<string> {
+        let status = await reportUser(msg, partner_profile.email, "Normal Service Report");
+        if (status) {
+            return "Successfully reported the elder";
+        }
+        return "Failed to report the elder";
+    }
 </script>
 
 <div 
@@ -225,8 +235,11 @@
                             />
                             <p style="color: green" class="time-status">{formatMilliseconds(requestForm.remainingTime)} remaining</p>
                         {/if}
-                        <Button color="red" onclick={() => {abortModal = true}}>Abort</Button>
-                        <Button color="green" onclick={() => {finishModal = true}}>Finish</Button>
+                        <div style="display:flex; gap: 3px">
+                            <ReportModal page="0%" fn={reportPartner} color="dark" size="md"/>
+                            <Button color="red" onclick={() => {abortModal = true}}>Abort</Button>
+                            <Button color="green" onclick={() => {finishModal = true}}>Finish</Button>
+                        </div>
                     </div>
                 {/if}
             {:else}

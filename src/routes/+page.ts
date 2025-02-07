@@ -6,10 +6,10 @@ import { get_server_ip, login, user_data} from './user.svelte';
 
 export const load: PageLoad = async ({ fetch, params }) => {
     // console.log("Initial data loading...")
-    get_server_ip();
+    // get_server_ip();
     // user_data.serverIP = "192.168.1.8";
     // await login("v1@v.com", "vvvvvvvv", "/home", fetch);
-    // goto("/admin")
+    goto("/admin")
 
     // let isDataFileExist = await exists('data.txt', { baseDir: BaseDirectory.AppData});
     // if (isDataFileExist) {
