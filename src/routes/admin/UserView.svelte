@@ -5,6 +5,7 @@
     import { Button, Input } from "flowbite-svelte";
     import Fuse from 'fuse.js';
     import { pageData } from "./page_state.svelte";
+    import { user_data } from "../user.svelte";
 
     let users = $state([] as any[]);
 
@@ -15,12 +16,10 @@
 
     async function deleteUser(email: string) {
         try {
-            // let response = await fetch(`/admin/users`, {
-            // let response = await fetch(`${user_data.serverURL}/admin/delete/${email}`, {
-            let response = await fetch(`http://192.168.1.11:8000/admin/delete/${email}`, {
+            let response = await fetch(`${user_data.serverURL}/admin/delete/${email}`, {
                 method: "DELETE",
                 headers: {
-                    'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE3Mzg5ODY5Njl9.6x6LXfF8-nZd86R0R8CGXL3I5DZY8tmJyzBpR_R42gA`
+                    'Authorization': `Bearer ${user_data.sessionToken}`
                 },
             });
 
@@ -54,11 +53,10 @@
 
     async function getUsers() {
         try {
-            // let response = await fetch(`${user_data.serverURL}/admin/users`, {
-            let response = await fetch(`http://192.168.1.11:8000/admin/users`, {
+            let response = await fetch(`${user_data.serverURL}/admin/users`, {
                 method: "GET",
                 headers: {
-                    'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE3Mzg5ODY5Njl9.6x6LXfF8-nZd86R0R8CGXL3I5DZY8tmJyzBpR_R42gA`
+                    'Authorization': `Bearer ${user_data.sessionToken}`
                 },
             });
 
@@ -120,5 +118,4 @@
             height: 73vh;
         }
     }
-
 </style>

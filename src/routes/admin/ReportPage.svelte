@@ -36,11 +36,10 @@
 
     async function getFeedbacks() {
         try {
-            // let response = await fetch(`${user_data.serverURL}/admin/feedback`, {
-            let response = await fetch(`http://192.168.1.11:8000/admin/feedback`, {
+            let response = await fetch(`${user_data.serverURL}/admin/feedback`, {
                 method: "GET",
                 headers: {
-                    'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE3Mzg5ODY5Njl9.6x6LXfF8-nZd86R0R8CGXL3I5DZY8tmJyzBpR_R42gA`
+                    'Authorization': `Bearer ${user_data.sessionToken}`
                 },
             });
 
@@ -61,12 +60,10 @@
 
     async function updateStatus(id: number, newStatus: string) {
         try {
-            // let response = await fetch(`${user_data.serverURL}/admin/feedback/review/{id}`, {
-            // let response = await fetch(`${user_data.serverURL}/admin/feedback/review/{id}`, {
-            let response = await fetch(`http://192.168.1.11:8000/admin/feedback/review/${id}`, {
+            let response = await fetch(`${user_data.serverURL}/admin/feedback/review/${id}`, {
                 method: "PUT",
                 headers: {
-                    'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE3Mzg5ODY5Njl9.6x6LXfF8-nZd86R0R8CGXL3I5DZY8tmJyzBpR_R42gA`
+                    'Authorization': `Bearer ${user_data.sessionToken}`
                 },
             });
 
