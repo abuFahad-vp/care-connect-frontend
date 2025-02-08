@@ -1,10 +1,15 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { pageData } from "./page_state.svelte";
+    import { user_data } from "../user.svelte";
     let reports = $state([] as any[]);
 
     onMount(async () => {
-        await getFeedbacks();
+        try {
+            await getFeedbacks();
+        } catch (e: any) {
+            console.log("ERROR: ", e);
+        }
     });
 
     function customSort(reports: any[]) {
@@ -15,6 +20,19 @@
             return b.id - a.id;
         });
     }
+
+    user_data.websocket.addListener(async (msg) => {
+        if (msg.type === "Text") {
+            const incomingData = JSON.parse(msg.data)
+            if (incomingData.type === "new_feedback") {
+                try {
+                    await getFeedbacks();
+                } catch (e: any) {
+                    console.log("ERROR: ", e)
+                }
+            }
+        }
+    })
 
     async function getFeedbacks() {
         try {
@@ -41,27 +59,24 @@
         pageData.currentPageIndex = 1;
     }
 
-    // TODO
     async function updateStatus(id: number, newStatus: string) {
         try {
-            // let response = await fetch(`${user_data.serverURL}/admin/feedback`, {
-            let response = await fetch(`http://192.168.1.11:8000/admin/`, {
-                method: "GET",
+            // let response = await fetch(`${user_data.serverURL}/admin/feedback/review/{id}`, {
+            // let response = await fetch(`${user_data.serverURL}/admin/feedback/review/{id}`, {
+            let response = await fetch(`http://192.168.1.11:8000/admin/feedback/review/${id}`, {
+                method: "PUT",
                 headers: {
                     'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE3Mzg5ODY5Njl9.6x6LXfF8-nZd86R0R8CGXL3I5DZY8tmJyzBpR_R42gA`
                 },
             });
 
             if (response.ok) {
-                let responseData = await response.json() as any[];
-                reports = customSort(responseData);
-                console.log(responseData);
+                await getFeedbacks();
             }
         } catch (e: any) {
             console.log("ERROR: ", e);
         }
     }
-
 </script>
 
 <main class="main-container">
@@ -82,6 +97,9 @@
                 {report.status.replace('_', ' ').toUpperCase()}
               </span>
             </div>
+            <div>
+                <p>feedback type: <strong>{report.feedback_type}</strong></p>
+            </div>
             <div class="buttons-div">
               <button 
                 onclick={() => viewProfile(report.reported_email, 'reported')}
@@ -95,12 +113,14 @@
               >
                 View Reporter Profile
               </button>
+              {#if report.status !== 'reviewed'}
               <button 
                 onclick={() => updateStatus(report.id, 'reviewed')}
                 class="buttons bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
               >
                 Mark as Reviewed
               </button>
+              {/if}
             </div>
           </div>
         </div>
@@ -133,6 +153,7 @@
     max-width: 500px;
     margin: 0 auto;
     padding: 15px;
+    touch-action: pan-y;
   }
   
   .report-card {

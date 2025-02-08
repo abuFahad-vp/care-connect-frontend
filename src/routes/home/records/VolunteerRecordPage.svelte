@@ -20,16 +20,14 @@
 
         inputsAndTextareas.forEach(element => {
             element.addEventListener('focus', () => {
-                // Add temporary padding to the body to make space for the keyboard
                 document.body.style.paddingBottom = '300px';
 
                 setTimeout(() => {
                 element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 300); // Delay for keyboard animation
+                }, 300);
             });
 
             element.addEventListener('blur', () => {
-                // Remove the extra padding when the element loses focus
                 document.body.style.paddingBottom = '0';
             });
         });
@@ -144,7 +142,7 @@
     }
 
     async function reportPartner(msg: string): Promise<string> {
-        let status = await reportUser(msg, record_contract.partner_profile.email, "Weekend service");
+        let status = await reportUser(msg, record_contract.partner_profile.email, "Weekend service report");
         if (status) {
             return `Successfully reported the ${record_contract.partner_profile.user_type}`
         } else {
