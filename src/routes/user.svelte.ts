@@ -90,13 +90,9 @@ export async function login(email: string, password: string, redirect: string, f
       let ws = await WebSocket.connect(`ws://${user_data.serverIP}:8000/ws?token=${user_data.sessionToken}`);
       user_data.websocket = ws;
 
-      user_data.serverURL = `http://${user_data.serverIP}:8000`;
-
       if (redirect !== "") {
         goto(redirect);
       }
-
-      const contents = JSON.stringify(data.data);
     } else {
 
       const error = await response.json();
@@ -139,6 +135,7 @@ export async function get_server_ip() {
       if (validIp) {
         user_data.searchingIP = false;
         user_data.serverIP = validIp;
+        user_data.serverURL = `http://${user_data.serverIP}:8000`;
         console.log("SERVER IP FOUND:", validIp);
         return true;
       }

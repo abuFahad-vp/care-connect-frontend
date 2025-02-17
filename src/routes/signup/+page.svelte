@@ -12,7 +12,7 @@
     onMount(() => {
 
         const inputsAndTextareas = document.querySelectorAll('input, textarea');
-        const form = document.querySelector('form');
+        // const form = document.querySelector('form');
 
         inputsAndTextareas.forEach(element => {
             element.addEventListener('focus', () => {
@@ -148,13 +148,13 @@
         if (validateForm()) {
             try {
                 const formDataRequest = new FormData(event.target as HTMLFormElement);
-                const response = await fetch(`http://${user_data.serverIP}:8000/signup`, {
+                const response = await fetch(`${user_data.serverURL}/signup`, {
+                // const response = await fetch(`http://localhost:1420/signup`, {
                     method: "POST",
                     body: formDataRequest
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    isSignupLoading = false;
                     console.log("Signup successfull:", data);
                     error_msg = "";
                     success_msg = "Registration successful. redirecting to login";
@@ -162,16 +162,22 @@
                     goto('/')
                 } else {
                     const error = await response.json();
-                    error_msg = error.detail;
-                    console.error("Login failed:", error.detail);
+                    if (error.detail !== undefined) {
+                        error_msg = error.detail;
+                    } else {
+                        error_msg = "Signup failed: Invalid request to the server";
+                    }
+                    console.error("Signup failed:", error.detail);
                 }
             } catch (error: any) {
+                error_msg = error.message;
                 console.error("Error during login:", error.message);
             } finally {
                 isSignupLoading = false;
             }
+        } else {
+            isSignupLoading = false;
         }
-        isSignupLoading = false;
     }
 
     function handleFileChange(event: Event) {
@@ -340,7 +346,7 @@
             {/if}
             <button class="submit-button" type="submit">
             {#if isSignupLoading}
-                <LoadingSpinner color="#ffffff"/>
+                <LoadingSpinner size="1rem" thickness_needle="0.1rem" thickness_outer="0.1rem" color="#ffffff"/>
             {:else}
                 Sign Up
             {/if}
