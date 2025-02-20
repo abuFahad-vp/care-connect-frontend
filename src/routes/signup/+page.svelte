@@ -56,7 +56,8 @@
         location: '',
     });
 
-    let profile_image: File | null =  null;
+    let profile_image: File | null =  $state(null);
+
 
     let error_msg = $state("")
     let success_msg = $state("")
@@ -155,13 +156,13 @@
             return res;
         } catch (error) {
             if (retry++ > 5) throw error;
-            await new Promise(resolve => setTimeout(resolve, 3000 * retry));
+            await new Promise(resolve => setTimeout(resolve, 500));
             return refetch(url, options, retry);
         }
     }
 
     async function onsubmit(event: SubmitEvent) {
-
+        event.preventDefault();
         isSignupLoading = true;
         error_msg = "";
 
@@ -174,6 +175,9 @@
         if (serverIP === "") {
             isSignupLoading = false;
             error_msg = "Failed to find the IP of server.";
+            const fileInput = document.querySelector('#profile_image') as HTMLInputElement;
+            if (fileInput) fileInput.value = '';
+            profile_image = null;
             return
         }
 
@@ -183,7 +187,20 @@
                 localStorage.clear();
                 sessionStorage.clear();
 
-                const formDataRequest = new FormData(event.target as HTMLFormElement);
+                const formDataRequest = new FormData();
+    
+                const formDataObject = formData as Record<string, string>;
+
+                Object.keys(formDataObject).forEach((key) => {
+                    formDataRequest.append(key, formDataObject[key]);
+                });
+
+                if (profile_image) {
+                    formDataRequest.append("profile_image", profile_image);
+                } else {
+                    console.error("Invalid file selected");
+                }
+
                 const response = await refetch(signup_url, {
 
                 // const response = await fetch(`http://localhost:1420/signup`, {
@@ -214,9 +231,15 @@
                 console.error("Error during login:", error.message);
             } finally {
                 isSignupLoading = false;
+                const fileInput = document.querySelector('#profile_image') as HTMLInputElement;
+                if (fileInput) fileInput.value = '';
+                profile_image = null;
             }
         } else {
             isSignupLoading = false;
+            const fileInput = document.querySelector('#profile_image') as HTMLInputElement;
+            if (fileInput) fileInput.value = '';
+            profile_image = null;
         }
     }
 
