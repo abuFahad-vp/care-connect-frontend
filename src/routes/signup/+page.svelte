@@ -153,7 +153,7 @@
             let serverIP = await get_server_ip();
             if (!serverIP) {
                 isSignupLoading = false;
-                error_msg = "1: Failed to find the IP of server.";
+                error_msg = "Failed to find the IP of server.";
                 return
             }
         }
@@ -176,14 +176,15 @@
                 } else {
                     const error = await response.json();
                     if (error.detail !== undefined) {
-                        error_msg = `2: ${error.detail}: ${signup_url}`;
+                        error_msg = `${error.detail}`;
+                        // error_msg = `2: ${error.detail}: ${signup_url}`;
                     } else {
-                        error_msg = `3: Signup failed: Invalid request to the server: ${signup_url}`;
+                        error_msg = `Signup failed: Invalid request to the server: ${signup_url}`;
                     }
                     console.error("Signup failed:", error.detail);
                 }
             } catch (error: any) {
-                error_msg = `4: ${error.message}: ${signup_url}`;
+                error_msg = `${error}: ${error.message}: ${signup_url}`;
                 console.error("Error during login:", error.message);
             } finally {
                 isSignupLoading = false;
