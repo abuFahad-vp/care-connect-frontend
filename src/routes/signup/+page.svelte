@@ -54,13 +54,16 @@
         contact_number: '',
         bio: '',
         location: '',
-        profile_image: new File([], ""),
     });
+
+    let profile_image: File | null =  null;
 
     let error_msg = $state("")
     let success_msg = $state("")
     let isLocationLoading = $state(false);
     let isSignupLoading = $state(false);
+    let serverIP = $state("");
+    let showIPInput = $state(false);
 
     const getLocation = async (event: MouseEvent) => {
         event.preventDefault();
@@ -89,10 +92,7 @@
         if (!validateDOB()) { return false }
         if (!validatePhone()) { return false }
         if (!validateLocation()) { return false }
-        if (formData.profile_image.size <= 0) {
-            error_msg = "Must upload a profile picture";
-            return false
-        }
+
         error_msg = ""
         return true
     }
@@ -147,25 +147,51 @@
         return true
     }
 
-    async function onsubmit(event: SubmitEvent) {
-        isSignupLoading = true;
-        if (user_data.serverIP === "" && user_data.searchingIP === false) {
-            let serverIP = await get_server_ip();
-            if (!serverIP) {
-                isSignupLoading = false;
-                error_msg = "Failed to find the IP of server.";
-                return
-            }
+    async function refetch(url: string, options = {}, retry = 0) {
+        try {
+            const res = await fetch(url, options);
+            if (res.status == 429) throw "Throttling"
+            if (res.status >= 500) throw "Transient error"
+            return res;
+        } catch (error) {
+            if (retry++ > 5) throw error;
+            await new Promise(resolve => setTimeout(resolve, 3000 * retry));
+            return refetch(url, options, retry);
         }
+    }
+
+    async function onsubmit(event: SubmitEvent) {
+
+        isSignupLoading = true;
+        error_msg = "";
+
+        let new_serverIP = await get_server_ip();
+
+        if (serverIP === "" && new_serverIP !== "") {
+            serverIP = new_serverIP
+        }
+
+        if (serverIP === "") {
+            isSignupLoading = false;
+            error_msg = "Failed to find the IP of server.";
+            return
+        }
+
         if (validateForm()) {
-            const signup_url = `${user_data.serverURL}/signup`;
+            const signup_url = `http://${serverIP}:8000/signup`;
             try {
+                localStorage.clear();
+                sessionStorage.clear();
+
                 const formDataRequest = new FormData(event.target as HTMLFormElement);
-                const response = await fetch(signup_url, {
+                const response = await refetch(signup_url, {
+
                 // const response = await fetch(`http://localhost:1420/signup`, {
                     method: "POST",
-                    body: formDataRequest
+                    body: formDataRequest,
+                    cache: "no-store"
                 });
+
                 if (response.ok) {
                     const data = await response.json();
                     console.log("Signup successfull:", data);
@@ -200,14 +226,16 @@
         if (file) {
             if (file.type.startsWith("image/")) {
                 if (file.size <= 500 * 1024 ) {
-                    formData.profile_image = file;
+                    profile_image = file;
                     error_msg = "";
                 } else {
-                    formData.profile_image = new File([], "") ,
+                    // formData.profile_image = new File([], "") ,
+                    profile_image = null;
                     error_msg = "Image size must be less than 500KB."
                 }
             } else {
-                formData.profile_image = new File([], "") ,
+                // formData.profile_image = new File([], "") ,
+                profile_image = null;
                 error_msg = "Invalid file format. only support image types."
             }
         }
@@ -220,6 +248,13 @@
     <div class="background1"></div>
     <div class="background2"></div>
         <a href="/" class="back-link">←</a>
+        {#if showIPInput}
+        <input type="text" bind:value={user_data.myIP}>
+        <input type="text" bind:value={serverIP}>
+        <button onclick={() => showIPInput = false}>close</button>
+        {:else}
+        <button style="background-color: transparent; color:black" onclick={() => showIPInput = true}>.</button>
+        {/if}
         <form class="signup-form" {onsubmit}>
             <div class="form-group">
                 <label for="">User Type</label>

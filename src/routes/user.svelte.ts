@@ -45,22 +45,25 @@ export async function login(email: string, password: string, redirect: string, f
   };
 
   try {
-    if (user_data.serverIP === "" && user_data.searchingIP === false) {
-      let serverIP = await get_server_ip();
-      if (!serverIP) {
-        return_response.error_msg = "Network error"
-        return return_response;
-      }
+
+    let serverIP = await get_server_ip();
+
+    if (serverIP === "") {
+      return_response.error_msg = "Network error"
+      return return_response;
     }
+
+    user_data.serverIP = serverIP;
+
     const formData = new FormData();
     formData.append("username", email);
     formData.append("password", password);
     let response: any;
 
-    if (user_data.serverIP === "") {
-        return_response.error_msg = "Network error"
-        return return_response;
-    }
+    // if (user_data.serverIP === "") {
+    //     return_response.error_msg = "Network error"
+    //     return return_response;
+    // }
 
     if (fetch_custom) {
       response = await fetch_custom(`http://${user_data.serverIP}:8000/token`, {
@@ -83,6 +86,7 @@ export async function login(email: string, password: string, redirect: string, f
 
       user_data.sessionToken = data.access_token;
       user_data.data = data.data;
+      user_data.serverURL = `http://${user_data.serverIP}:8000`;
 
       return_response.result = true;
       return_response.error_msg = "";
@@ -110,7 +114,7 @@ export async function login(email: string, password: string, redirect: string, f
   }
 }
 
-export async function get_server_ip() {
+export async function get_server_ip(): Promise<string> {
   try {
     user_data.searchingIP = true;
 
@@ -134,17 +138,16 @@ export async function get_server_ip() {
       const validIp = results.find(result => result !== null);
       if (validIp) {
         user_data.searchingIP = false;
-        user_data.serverIP = validIp;
-        user_data.serverURL = `http://${user_data.serverIP}:8000`;
         console.log("SERVER IP FOUND:", validIp);
-        return true;
+        return validIp;
+        // user_data.serverURL = `http://${user_data.serverIP}:8000`;
       }
     }
     user_data.searchingIP = false;
-    return false;
+    return "";
   } catch (error) {
     user_data.searchingIP = false;
-    return false;
+    return "";
   }
 }
 
