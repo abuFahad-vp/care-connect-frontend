@@ -31,6 +31,19 @@
         });
     });
 
+    // let formData = $state({
+    //     user_type: 'volunteer',
+    //     full_name: 'v5',
+    //     email: 'v5@v.com',
+    //     password: 'vvvvvvvv',
+    //     confirm_password: 'vvvvvvvv',
+    //     dob: '01-01-2006',
+    //     contact_number: '+919876543210',
+    //     bio: 'nil',
+    //     location: '',
+    //     profile_image: new File([], ""),
+    // });
+
     let formData = $state({
         user_type: 'volunteer',
         full_name: '',
@@ -58,7 +71,7 @@
             });
             formData.location = `${position.coords.latitude},${position.coords.longitude}`;
         } catch (error) {
-            error_msg = error as string
+            error_msg = `location error: ${error as string}`;
         } finally {
             isLocationLoading = false;
         }
@@ -136,19 +149,19 @@
 
     async function onsubmit(event: SubmitEvent) {
         isSignupLoading = true;
-        event.preventDefault();
         if (user_data.serverIP === "" && user_data.searchingIP === false) {
             let serverIP = await get_server_ip();
             if (!serverIP) {
                 isSignupLoading = false;
-                error_msg = "Failed to find the IP of server.";
+                error_msg = "1: Failed to find the IP of server.";
                 return
             }
         }
         if (validateForm()) {
+            const signup_url = `${user_data.serverURL}/signup`;
             try {
                 const formDataRequest = new FormData(event.target as HTMLFormElement);
-                const response = await fetch(`${user_data.serverURL}/signup`, {
+                const response = await fetch(signup_url, {
                 // const response = await fetch(`http://localhost:1420/signup`, {
                     method: "POST",
                     body: formDataRequest
@@ -163,14 +176,14 @@
                 } else {
                     const error = await response.json();
                     if (error.detail !== undefined) {
-                        error_msg = error.detail;
+                        error_msg = `2: ${error.detail}: ${signup_url}`;
                     } else {
-                        error_msg = "Signup failed: Invalid request to the server";
+                        error_msg = `3: Signup failed: Invalid request to the server: ${signup_url}`;
                     }
                     console.error("Signup failed:", error.detail);
                 }
             } catch (error: any) {
-                error_msg = error.message;
+                error_msg = `4: ${error.message}: ${signup_url}`;
                 console.error("Error during login:", error.message);
             } finally {
                 isSignupLoading = false;
