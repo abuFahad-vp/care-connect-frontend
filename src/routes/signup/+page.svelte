@@ -66,6 +66,7 @@
     let isSignupLoading = $state(false);
     let serverIP = $state("");
     let showIPInput = $state(false);
+    let fileInput: HTMLInputElement; 
 
     const getLocation = async (event: MouseEvent) => {
         event.preventDefault();
@@ -176,9 +177,10 @@
         if (serverIP === "") {
             isSignupLoading = false;
             error_msg = "Failed to find the IP of server.";
-            const fileInput = document.querySelector('#profile_image') as HTMLInputElement;
-            if (fileInput) fileInput.value = '';
-            profile_image = null;
+            // const fileInput = document.querySelector('#profile_image') as HTMLInputElement;
+            // if (fileInput) fileInput.value = '';
+            // profile_image = null;
+            profileReset();
             return
         }
 
@@ -215,6 +217,7 @@
                     console.log("Signup successfull:", data);
                     error_msg = "";
                     success_msg = "Registration successful. redirecting to login";
+                    profileReset();
                     await sleep(1000);
                     goto('/')
                 } else {
@@ -232,15 +235,23 @@
                 console.error("Error during login:", error.message);
             } finally {
                 isSignupLoading = false;
-                const fileInput = document.querySelector('#profile_image') as HTMLInputElement;
-                if (fileInput) fileInput.value = '';
-                profile_image = null;
+                profileReset();
+                // const fileInput = document.querySelector('#profile_image') as HTMLInputElement;
+                // if (fileInput) fileInput.value = '';
+                // profile_image = null;
             }
         } else {
             isSignupLoading = false;
-            const fileInput = document.querySelector('#profile_image') as HTMLInputElement;
-            if (fileInput) fileInput.value = '';
-            profile_image = null;
+            // const fileInput = document.querySelector('#profile_image') as HTMLInputElement;
+            // if (fileInput) fileInput.value = '';
+            // profile_image = null;
+            profileReset();
+        }
+    }
+
+    function handleFormChange(event: Event) {
+        if (event.target !== fileInput) {
+            profileReset();
         }
     }
 
@@ -264,6 +275,12 @@
             }
         }
     }
+
+    function profileReset() {
+        // const fileInput = document.querySelector('#profile_image') as HTMLInputElement;
+        if (fileInput) fileInput.value = '';
+        profile_image = null;
+    }
 </script>
 
 <main>
@@ -279,7 +296,7 @@
         {:else}
         <button style="background-color: transparent; color:black" onclick={() => showIPInput = true}>.</button>
         {/if}
-        <form class="signup-form" {onsubmit}>
+        <form class="signup-form" {onsubmit} onchange={handleFormChange}>
             <div class="form-group">
                 <label for="">User Type</label>
                 <div class="radio-group">
@@ -390,17 +407,6 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="profile_image">Profile Image</label>
-                <input 
-                    type="file" 
-                    id="profile_image" 
-                    name="profile_image" 
-                    onchange={handleFileChange}
-                    accept="image/*"
-                    required
-                >
-            </div>
-            <div class="form-group">
                 <label for="bio">Bio</label>
                 <textarea 
                     id="bio" 
@@ -410,6 +416,17 @@
                     rows="5"
                     required
                 ></textarea>
+            </div>
+            <div class="form-group">
+                <label for="profile_image">Profile Image</label>
+                <input 
+                    type="file" 
+                    id="profile_image" 
+                    name="profile_image" 
+                    bind:this={fileInput}
+                    onchange={handleFileChange}
+                    required
+                >
             </div>
             <div class="form-group">
                 <p class="error-msg" style="color: red;">{error_msg}</p>
