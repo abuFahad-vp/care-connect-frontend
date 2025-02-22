@@ -8,6 +8,7 @@
     import Background from '../Background.svelte';
     import parsePhoneNumberFromString from 'libphonenumber-js';
     import { onMount } from 'svelte';
+    import { fetch  as fetch_t } from '@tauri-apps/plugin-http';
 
     onMount(() => {
 
@@ -150,7 +151,7 @@
 
     async function refetch(url: string, options = {}, retry = 0) {
         try {
-            const res = await fetch(url, options);
+            const res = await fetch_t(url, options);
             if (res.status == 429) throw "Throttling"
             if (res.status >= 500) throw "Transient error"
             return res;

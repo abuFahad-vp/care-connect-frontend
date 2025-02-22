@@ -26,4 +26,5 @@ localip = "0.2.1"
 tauri-plugin-store = "2"
 tauri-plugin-fs = "2"
 tauri-plugin-websocket = "2"
+tauri-plugin-http = "2"
 

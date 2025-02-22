@@ -563,6 +563,7 @@
 		touch-action: pan-y;
 		border-radius: 30px;
 		background-color: #ffffff;
+        margin-bottom: 40px;
 	}
 
 	.expanded {
