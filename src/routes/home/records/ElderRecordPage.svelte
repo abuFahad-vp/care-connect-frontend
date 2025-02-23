@@ -72,8 +72,7 @@
                     'Authorization': `Bearer ${user_data.sessionToken}`
                 }
             });
-            if (response.ok) {
-                await getPartner();
+            if (await getPartner() === true) {
                 return
             }
             responseData = await response.json() as any;

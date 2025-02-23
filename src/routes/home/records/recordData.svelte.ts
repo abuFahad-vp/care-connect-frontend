@@ -29,6 +29,7 @@ export async function unassign() {
         console.log(e)
     }
 }
+
 export async function getPartner() {
     try {
         let response = await fetch(`${user_data.serverURL}/user/know_your_partner`, {
@@ -41,8 +42,10 @@ export async function getPartner() {
             let responseData = await response.json() as any;
             record_contract.is_assigned = true;
             record_contract.partner_profile = responseData.partner;
+            return true;
         }
     } catch (e: any) {
         console.log(e)
+        return false;
     }
 }
