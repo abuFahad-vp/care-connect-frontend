@@ -7,31 +7,31 @@
     let error_msg = $state("");
     let isLoading = $state(false);
 
-  const togglePasswordVisibility = () => {
-    showPassword = !showPassword;
-  };
+    const togglePasswordVisibility = () => {
+      showPassword = !showPassword;
+    };
 
-  async function onsubmit(e: SubmitEvent) {
-    isLoading = true;
-    error_msg = "";
-    const formData = new FormData(e.target as HTMLFormElement);
-    let username = formData.get("username") as string;
-    let password = formData.get("password") as string;
+    async function onsubmit(e: SubmitEvent) {
+      isLoading = true;
+      error_msg = "";
+      const formData = new FormData(e.target as HTMLFormElement);
+      let username = formData.get("username") as string;
+      let password = formData.get("password") as string;
 
-    let redirect;
-    if (username === "admin@admin.com") {
-      redirect = "/admin"
-    } else {
-      redirect = "/home"
-    }
+      let redirect;
+      if (username === "admin@admin.com") {
+        redirect = "/admin"
+      } else {
+        redirect = "/home"
+      }
 
-    const response = await login(username, password, redirect);
-    if (response?.result) {
-      console.log("Successfully logged");
-      return
-    }
-    error_msg = response?.error_msg as string;
-    isLoading = false;
+      const response = await login(username, password, redirect);
+      if (response?.result) {
+        console.log("Successfully logged");
+        return
+      }
+      error_msg = response?.error_msg as string;
+      isLoading = false;
   }
   let showIPInput = $state(false);
 </script>
