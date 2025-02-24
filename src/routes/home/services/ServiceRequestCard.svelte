@@ -12,6 +12,7 @@
     let {requestForm, id} = $props()
     let partner_profile = requestForm.elder_profile;
     let service_form = requestForm.service_form;
+    console.log("EMERGENCY: ", service_form["urgent"]);
 
     let locations = service_form.locations.map((location: string) => {
         let x = location.split("|");
@@ -159,6 +160,11 @@
             </div>
         </div>
         <div class="form-container">
+            {#if service_form["urgent"]}
+              <p class="text-xl font-bold text-white bg-red-600 px-4 py-2 rounded-lg shadow-md animate-pulse">
+                  🚨 It's an EMERGENCY! 🚨
+              </p>
+            {/if}
             <div class="form-details">
                 <p class="service-id"><strong>Service ID:</strong> {service_form.service_id}</p>
                 <p class="status"><strong>Status:</strong> {service_form.status}</p>
@@ -256,6 +262,11 @@
                 <div class="card-header">
                     <div class="card-details">
                         <p class="name">{partner_profile.full_name}</p>
+                        {#if service_form["urgent"]}
+                          <p class="text-xl font-bold text-white bg-red-600 px-4 py-2 rounded-lg shadow-md animate-pulse">
+                              🚨 It's an EMERGENCY! 🚨
+                          </p>
+                        {/if}
                         <p class="service-id">Service ID: {service_form.service_id}</p>
                         <!-- <p class="time-period">From: {service_form.time_period_from}</p>
                         <p class="time-period">To: {service_form.time_period_to}</p> -->

@@ -33,7 +33,8 @@
     // formData.isSubmitting = true;
     // formData.isAccepted = true;
 
-	let isLocationLoading = $state(false);
+    let isUrgent = $state(false);
+    let isLocationLoading = $state(false);
 
     setInterval(() => {
         if (formData.isSubmitting && !formData.isAccepted && new Date().getTime() > parseDate(formData.time_period_to).getTime()) {
@@ -240,8 +241,8 @@
 			formData.append('documents', files);
 		});
 		console.log("Server URL => ", user_data.serverIP);
-        const timeout_end = requestData.time_period_to.replace('T', ' ');
-        const url = new URL(`http://${user_data.serverIP}:8000/elder/new_service_request/${timeout_end}`);
+    const timeout_end = requestData.time_period_to.replace('T', ' ');
+    const url = new URL(`http://${user_data.serverIP}:8000/elder/new_service_request/${timeout_end}/${isUrgent}`);
 
 		url.searchParams.append('description', requestData.description);
 		url.searchParams.append('has_documents', requestData.has_documents.toString());
@@ -332,6 +333,12 @@
                     </form>
                 </Modal>
             <fieldset disabled="{formData.isSubmitting}">
+                <div class="flex items-center space-x-3 p-3 bg-gray-100 rounded-lg shadow-md">
+                    <label for="urgent" class="flex items-center space-x-2 cursor-pointer">
+                        <input id="urgent" type="checkbox" bind:checked={isUrgent} class="w-5 h-5 text-red-500 border-gray-300 rounded focus:ring-red-400" />
+                        <span class="text-lg font-semibold text-gray-700">Is it an emergency?</span>
+                    </label>
+                </div>
                 <div class="form-group">
                     <label for="description">Description</label>
                     <textarea
