@@ -187,8 +187,6 @@
         if (validateForm()) {
             const signup_url = `http://${serverIP}:8000/signup`;
             try {
-                localStorage.clear();
-                sessionStorage.clear();
 
                 const formDataRequest = new FormData();
     
@@ -204,12 +202,11 @@
                     console.error("Invalid file selected");
                 }
 
-                const response = await refetch(signup_url, {
+                const response = await fetch(signup_url, {
 
                 // const response = await fetch(`http://localhost:1420/signup`, {
                     method: "POST",
                     body: formDataRequest,
-                    cache: "no-store"
                 });
 
                 if (response.ok) {

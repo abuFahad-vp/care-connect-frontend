@@ -42,6 +42,7 @@
   <div class="background1"></div>
   <div class="background2"></div>
   <div class="banner">
+    <li><a href="/chat/{"544-211"}/{"v1@v.com"}">click me</a></li>
   {#if showIPInput}
   <input type="text" bind:value={user_data.myIP}>
   <input type="text" bind:value={user_data.serverIP}>
