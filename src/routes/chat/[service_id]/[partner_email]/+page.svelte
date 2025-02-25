@@ -10,13 +10,17 @@
     }
     chatData.partner_profile = data.partner_profile;
 
-    const socket = new WebSocket('ws://192.168.1.5:8000/chat');
+    let my_email = "";
+    if (chatData.partner_profile.email === "v1@v.com") {
+      my_email = "e1@e.com"
+    } else {
+      my_email = "v1@v.com"
+    }
+
+    const socket = new WebSocket(`ws://192.168.1.5:8000/chat/${my_email}`);
 
     socket.onopen = () => {
       console.log('WebSocket connection established')
-    }
-    socket.onmessage = (event) => {
-      console.log('Message recieved: ', event.data);
     }
     socket.onclose = () => {
       console.log("WebSocket connection closed");

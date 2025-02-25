@@ -1,8 +1,10 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
     import { user_data } from '../../../user.svelte';
     import { chatData } from './chat_data.svelte';
     import ChatHeader from './ChatHeader.svelte';
     import ChatMessage from './ChatMessage.svelte';
+    import RecordsPage from '../../../home/records/RecordsPage.svelte';
 
     let messages: ChatMessageTemp[] = $state([
     ]);
@@ -19,6 +21,13 @@
         avatar: chatData.partner_profile.profile_image,
     };
 
+    let my_email = "";
+    if (chatData.partner_profile.email === "v1@v.com") {
+      my_email = "e1@e.com"
+    } else {
+      my_email = "v1@v.com"
+    }
+
     // Auto-scroll to the latest message when messages update
     $effect(() => {
         if (messages.length && messageContainer) {
@@ -27,6 +36,23 @@
             }, 0);
         }
     });
+
+    onMount(async () => {
+      try {
+        //let response = await fetch(`${user_data.serverURL}/user/messages/${chatData.service_id}`)
+        let response = await fetch(`http://192.168.1.5:8000/user/messages/${chatData.service_id}`)
+        if (!response.ok) {
+          throw new Error("Failed to fetch the messages");
+        }
+        messages = await response.json();
+        messages = messages.map(msg => ({
+            ...msg,
+            timestamp: new Date(msg.timestamp)
+        }));
+      } catch(error) {
+        console.log("ERROR: ", error)
+      }
+    })
 
     function handleFocus() {
         resizeTextarea();
@@ -56,7 +82,7 @@
                 service_id: chatData.service_id,
                 content: content,
                 //sender: user_data.data.email,
-                sender: "e1@e.com",
+                sender: my_email,
                 reciever: chatData.partner_profile.email,
                 timestamp: new Date(),
                 status: "sent",
@@ -66,6 +92,15 @@
         chatData.socket?.send(JSON.stringify(new_message));
         content = "";
         resizeTextarea();
+    }
+    
+    if (chatData.socket !== undefined) {
+      chatData.socket.onmessage = (event) => {
+        console.log('Message recieved: ', event.data);
+        const data = JSON.parse(event.data);
+        data.timestamp = new Date(data.timestamp);
+        messages.push(data);
+      }
     }
 
     function resizeTextarea() {
@@ -91,7 +126,7 @@
         {#each messages as message (message.id)}
             <ChatMessage
                 {message}
-                isOwnMessage={message.sender === "e1@e.com"}
+                isOwnMessage={my_email === message.sender}
             />
         {/each}
     </div>
