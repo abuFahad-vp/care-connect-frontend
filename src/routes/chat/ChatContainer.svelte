@@ -3,8 +3,9 @@
     import { chatData } from './chat_data.svelte';
     import ChatHeader from './ChatHeader.svelte';
     import ChatMessage from './ChatMessage.svelte';
-    import { user_data } from '../../../../user.svelte';
-    import { Button } from 'flowbite-svelte';
+    import { user_data } from '../user.svelte';
+    
+    let {show = $bindable()} = $props()
 
     let messages: ChatMessageTemp[] = $state([
     ]);
@@ -32,7 +33,7 @@
 
     onMount(async () => {
       try {
-        let response = await fetch(`http://${chatData.ip}:8000/user/messages/${chatData.service_id}`)
+        let response = await fetch(`${user_data.serverURL}/user/messages/${chatData.service_id}`)
         //let response = await fetch(`http://192.168.1.5:8000/user/messages/${chatData.service_id}`)
         if (!response.ok) {
           throw new Error("Failed to fetch the messages");
@@ -105,7 +106,7 @@
     class="flex flex-col bg-white"
     style="height: {keyboardVisible ? viewportHeight + 'px' : '100vh'};"
 >
-    <ChatHeader user={currentUser} />
+    <ChatHeader user={currentUser} bind:show={show} />
 
     <div
         bind:this={messageContainer}

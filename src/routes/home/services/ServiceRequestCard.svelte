@@ -8,10 +8,12 @@
     import { ExclamationCircleOutline } from "flowbite-svelte-icons";
     import ProfileViewModal from "../ProfileViewModal.svelte";
     import ReportModal from "../../ReportModal.svelte";
+    import ChatWindow from "../../chat/ChatWindow.svelte";
 
     let {requestForm, id} = $props()
     let partner_profile = requestForm.elder_profile;
     let service_form = requestForm.service_form;
+    let isShowChat = $state(false);
     console.log("EMERGENCY: ", service_form["urgent"]);
 
     let locations = service_form.locations.map((location: string) => {
@@ -158,13 +160,13 @@
             <div class="modal-button">
                 <ProfileViewModal formData={partner_profile}/>
                 <div style="margin-left: 10px; padding: 5px;align-self: center;">
-                  <Button 
-                  color="light" 
-                  size="xs" 
-                  onclick={() => {
-                    window.location.href = 
-                      `/chat/${user_data.serverIP}/${service_form.service_id}/${partner_profile.email}`}
-                  }>Chat</Button>
+                {#if !isShowChat}
+                <div style="padding: 5px;">
+                  <Button onclick={() => isShowChat = true} color="light" size="xs">Chat</Button>
+                </div>
+                {:else}
+                <ChatWindow partner_profile={partner_profile} service_id={service_form.service_id} bind:show={isShowChat}/>
+                {/if}
                 </div>
             </div>
         </div>

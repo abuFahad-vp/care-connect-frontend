@@ -1,18 +1,21 @@
 <script lang="ts">
     import { ArrowLeft } from 'lucide-svelte';
-    import { displayImage } from '../../../../home/util.svelte';
+    import { displayImage } from '../home/util.svelte';
 
-    let { user } = $props<{
+    let { user, show = $bindable() } = $props<{
         user: {
             name: string;
             email: string;
             avatar: string;
-        }
+        },
+        show: boolean
     }>();
 
     
     function handleBack() {
-     window.location.href = "/home";
+      if (show) {
+        show = false;
+      }
     }
 
 </script>

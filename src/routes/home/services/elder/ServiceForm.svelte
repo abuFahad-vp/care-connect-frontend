@@ -12,6 +12,7 @@
     import { displayImage, formatDateTime, formatMilliseconds, reportUser } from '../../util.svelte';
     import ProfileViewModal from '../../ProfileViewModal.svelte';
     import ReportModal from '../../../ReportModal.svelte';
+    import ChatWindow from '../../../chat/ChatWindow.svelte';
 
     let { formData, id }: {
 		formData: service_form
@@ -20,6 +21,7 @@
 
     let confirmationModal = $state(false);
     let abortModal = $state(false);
+    let isShowChat = $state(false);
     // let remainingTimeinDate = $derived.by(() => {
     //     return formatMilliseconds(formData.remainingTime);
     // });
@@ -305,15 +307,13 @@
         {#if formData.isAccepted}
             <div class="profile-view">
                 <ProfileViewModal formData={formData.partner_profile}/>
+                {#if !isShowChat}
                 <div style="padding: 5px;">
-                  <Button 
-                  color="light" 
-                  size="xs" 
-                  onclick={() => {
-                    window.location.href = 
-                      `/chat/${user_data.serverIP}/${formData.service_id}/${formData.partner_profile.email}`}
-                  }>Chat</Button>
+                  <Button onclick={() => isShowChat = true} color="light" size="xs">Chat</Button>
                 </div>
+                {:else}
+                <ChatWindow partner_profile={formData.partner_profile} service_id={formData.service_id} bind:show={isShowChat}/>
+                {/if}
             </div>
         {/if}
 		<div class="full-content" transition:slide={{ duration: 300 }}>

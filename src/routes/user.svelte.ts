@@ -1,6 +1,7 @@
 import { goto } from '$app/navigation';
 import { invoke } from '@tauri-apps/api/core';
 import WebSocket from '@tauri-apps/plugin-websocket';
+import { chatData } from './chat/chat_data.svelte';
 
 export const user_data = $state({
     sessionToken: "",
@@ -10,6 +11,7 @@ export const user_data = $state({
     myIP: "",
     file: undefined as any,
     websocket: new WebSocket(0, [] as any),
+    chat_socket: new window.WebSocket("", [] as any),
     data: {
       user_type: '',
       full_name: '',
@@ -91,8 +93,22 @@ export async function login(email: string, password: string, redirect: string, f
       return_response.result = true;
       return_response.error_msg = "";
       return_response.data = data.data;
+
       let ws = await WebSocket.connect(`ws://${user_data.serverIP}:8000/ws?token=${user_data.sessionToken}`);
       user_data.websocket = ws;
+
+      const socket = new window.WebSocket(`ws://${user_data.serverIP}:8000/chat/${user_data.data.email}`);
+      socket.onopen = () => {
+        console.log('WebSocket connection established')
+      }
+      socket.onclose = () => {
+        console.log("WebSocket connection closed");
+      }
+      socket.onerror = (error) => {
+        console.error('Websocket error: ', error);
+      }
+      user_data.chat_socket = socket;
+      chatData.socket = socket;
 
       if (redirect !== "") {
         goto(redirect);
@@ -107,8 +123,8 @@ export async function login(email: string, password: string, redirect: string, f
     }
   } catch (error: any) {
     return_response.result = false;
-    return_response.error_msg = error.message;
-    console.error("Error during login:", error.message);
+    return_response.error_msg = error;
+    console.error("Error during login:", error);
   } finally {
     return return_response;
   }

@@ -4,6 +4,7 @@ export let record_contract = $state({
     partner_profile: undefined as any,
     is_assigned: false,
     is_requesting: false,
+    service_id : "",
 })
 
 export interface recordForm {
@@ -42,6 +43,7 @@ export async function getPartner() {
             let responseData = await response.json() as any;
             record_contract.is_assigned = true;
             record_contract.partner_profile = responseData.partner;
+            record_contract.service_id = responseData.record.service_id;
             return true;
         }
     } catch (e: any) {

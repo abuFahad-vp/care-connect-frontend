@@ -7,11 +7,13 @@
     import { displayImage, reportUser } from "../util.svelte";
     import { onMount } from "svelte";
     import ReportModal from "../../ReportModal.svelte";
+    import ChatWindow from "../../chat/ChatWindow.svelte";
 
     let showProfile = $state(false);
     let record_form = $state([] as recordForm[]);
     let feedbackText = $state("");
     let feedbackMsg = $state("");
+    let isShowChat = $state(false);
 
     user_data.websocket.addListener(async (msg) => {
         if (msg.type === "Text") {
@@ -111,6 +113,13 @@
                     <div class="view-button">
                         <Button onclick={() => showProfile = true} size="xs" color="yellow">View profile</Button>
                     </div>
+                    {#if !isShowChat}
+                    <div style="padding: 5px;">
+                      <Button onclick={() => isShowChat = true} color="light" size="xs">Chat</Button>
+                    </div>
+                    {:else}
+                    <ChatWindow partner_profile={record_contract.partner_profile} service_id={record_contract.service_id} bind:show={isShowChat}/>
+                    {/if}
                     <div class="unassign-button">
                         <Button size="xs" onclick={() => {unassign()}} color="red">Unassign</Button>
                     </div>

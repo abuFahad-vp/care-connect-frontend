@@ -42,8 +42,6 @@
   <div class="background1"></div>
   <div class="background2"></div>
   <div class="banner">
-    <li><a href="/chat/{"192.168.1.3"}/{"544-211"}/{"v1@v.com"}">am elder</a></li>
-    <li><a href="/chat/{"192.168.1.3"}/{"544-211"}/{"e1@e.com"}">am volunteer</a></li>
   {#if showIPInput}
   <input type="text" bind:value={user_data.myIP}>
   <input type="text" bind:value={user_data.serverIP}>
