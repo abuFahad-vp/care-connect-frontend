@@ -157,6 +157,15 @@
         <div class="profile-view">
             <div class="modal-button">
                 <ProfileViewModal formData={partner_profile}/>
+                <div style="margin-left: 10px; padding: 5px;align-self: center;">
+                  <Button 
+                  color="light" 
+                  size="xs" 
+                  onclick={() => {
+                    window.location.href = 
+                      `/chat/${user_data.serverIP}/${service_form.service_id}/${partner_profile.email}`}
+                  }>Chat</Button>
+                </div>
             </div>
         </div>
         <div class="form-container">
@@ -438,13 +447,18 @@
 
     .modal-buttons {
         display: flex;
+        flex-direction: column;
+        /* gap: 5px; */
+        align-items: center;
+        padding-bottom: 10px;
     }
 
     .profile-view {
         display: flex;
-        flex-direction: column;
+        /*flex-direction: column;*/
         /* gap: 5px; */
         align-items: center;
+        justify-content: center;
         padding-bottom: 10px;
     }
 </style>

@@ -305,6 +305,15 @@
         {#if formData.isAccepted}
             <div class="profile-view">
                 <ProfileViewModal formData={formData.partner_profile}/>
+                <div style="padding: 5px;">
+                  <Button 
+                  color="light" 
+                  size="xs" 
+                  onclick={() => {
+                    window.location.href = 
+                      `/chat/${user_data.serverIP}/${formData.service_id}/${formData.partner_profile.email}`}
+                  }>Chat</Button>
+                </div>
             </div>
         {/if}
 		<div class="full-content" transition:slide={{ duration: 300 }}>

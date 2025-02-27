@@ -84,17 +84,21 @@
         },
     ]);
 
-    user_data.websocket.addListener((msg) => {
-        if (msg.type == "Text") {
-            const incomingData = JSON.parse(msg.data)
-            if (incomingData.type === "new_volunteer_request") {
-                const requestEmail = incomingData.elder_profile.email;
-                newRequestProfile = incomingData.elder_profile;
-                isNewRequest = true;
-                console.log(`New volunteer request received: ${requestEmail}`);
-            }
-        }
-    })
+    try {
+      user_data.websocket.addListener((msg) => {
+          if (msg.type == "Text") {
+              const incomingData = JSON.parse(msg.data)
+              if (incomingData.type === "new_volunteer_request") {
+                  const requestEmail = incomingData.elder_profile.email;
+                  newRequestProfile = incomingData.elder_profile;
+                  isNewRequest = true;
+                  console.log(`New volunteer request received: ${requestEmail}`);
+              }
+          }
+      })
+    } catch (error) {
+      console.log("ERROR: ", error);
+    }
 
     async function updateRecord() {
         try {

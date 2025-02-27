@@ -1,6 +1,6 @@
 <script lang="ts">
     import { ArrowLeft } from 'lucide-svelte';
-    import { displayImage } from '../../../home/util.svelte';
+    import { displayImage } from '../../../../home/util.svelte';
 
     let { user } = $props<{
         user: {
@@ -11,7 +11,10 @@
     }>();
 
     
-    function handleBack() {}
+    function handleBack() {
+     window.location.href = "/home";
+    }
+
 </script>
 
 <div class="flex items-center px-4 py-3 bg-white border-b">

@@ -1,10 +1,10 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { user_data } from '../../../user.svelte';
     import { chatData } from './chat_data.svelte';
     import ChatHeader from './ChatHeader.svelte';
     import ChatMessage from './ChatMessage.svelte';
-    import RecordsPage from '../../../home/records/RecordsPage.svelte';
+    import { user_data } from '../../../../user.svelte';
+    import { Button } from 'flowbite-svelte';
 
     let messages: ChatMessageTemp[] = $state([
     ]);
@@ -21,13 +21,6 @@
         avatar: chatData.partner_profile.profile_image,
     };
 
-    let my_email = "";
-    if (chatData.partner_profile.email === "v1@v.com") {
-      my_email = "e1@e.com"
-    } else {
-      my_email = "v1@v.com"
-    }
-
     // Auto-scroll to the latest message when messages update
     $effect(() => {
         if (messages.length && messageContainer) {
@@ -39,8 +32,8 @@
 
     onMount(async () => {
       try {
-        //let response = await fetch(`${user_data.serverURL}/user/messages/${chatData.service_id}`)
-        let response = await fetch(`http://192.168.1.5:8000/user/messages/${chatData.service_id}`)
+        let response = await fetch(`http://${chatData.ip}:8000/user/messages/${chatData.service_id}`)
+        //let response = await fetch(`http://192.168.1.5:8000/user/messages/${chatData.service_id}`)
         if (!response.ok) {
           throw new Error("Failed to fetch the messages");
         }
@@ -57,10 +50,6 @@
     function handleFocus() {
         resizeTextarea();
         keyboardVisible = true;
-    }
-
-    function handleBlur() {
-        keyboardVisible = false;
     }
 
     function handleKeyDown(event: KeyboardEvent) {
@@ -81,8 +70,8 @@
                 id: messages.length + "",
                 service_id: chatData.service_id,
                 content: content,
-                //sender: user_data.data.email,
-                sender: my_email,
+                sender: user_data.data.email,
+                //sender: my_email,
                 reciever: chatData.partner_profile.email,
                 timestamp: new Date(),
                 status: "sent",
@@ -126,7 +115,7 @@
         {#each messages as message (message.id)}
             <ChatMessage
                 {message}
-                isOwnMessage={my_email === message.sender}
+                isOwnMessage={chatData.partner_profile.email === message.reciever}
             />
         {/each}
     </div>
@@ -136,13 +125,17 @@
         style="margin-bottom: {keyboardVisible ? '270px': '0'};"
     >
         <div class="flex items-center gap-2">
+            {#if keyboardVisible}
+            <button onclick={() => {keyboardVisible = false}}>v</button>
+            {:else}
+            <button onclick={() => {keyboardVisible = true}}>^</button>
+            {/if}
             <textarea
                 placeholder="Type a message..."
                 class="flex-1 px-4 py-2 rounded-xl border border-gray-300 focus:border-teal-800 focus:ring-1 focus:ring-teal-800 resize-none"
                 bind:this={textarea}
                 bind:value={content}
                 onfocus={handleFocus}
-                onblur={handleBlur}
                 oninput={resizeTextarea}
                 onkeydown={handleKeyDown}
                 rows="1"

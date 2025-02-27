@@ -13,19 +13,22 @@
         }
     });
 
-    user_data.websocket.addListener((msg) => {
-        if (msg.type == "Text") {
-            const incomingData = JSON.parse(msg.data)
-            console.log("HERE")
-            if (incomingData.type === "volunteer_service_message") {
-                if (incomingData.message === "unassign") {
-                    record_contract.is_assigned = false;
-                    record_contract.is_requesting = false;
-                }
-            }
-        }
-    })
-
+    try {
+      user_data.websocket.addListener((msg) => {
+          if (msg.type == "Text") {
+              const incomingData = JSON.parse(msg.data)
+              console.log("HERE")
+              if (incomingData.type === "volunteer_service_message") {
+                  if (incomingData.message === "unassign") {
+                      record_contract.is_assigned = false;
+                      record_contract.is_requesting = false;
+                  }
+              }
+          }
+      })
+    } catch (error) {
+      console.log("ERROR: ", error)
+    }
 </script>
 
 {#if user_data.data.user_type === "elder"}
