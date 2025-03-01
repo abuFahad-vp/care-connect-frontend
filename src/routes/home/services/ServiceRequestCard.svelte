@@ -253,7 +253,7 @@
                             <p style="color: green" class="time-status">{formatMilliseconds(requestForm.remainingTime)} remaining</p>
                         {/if}
                         <div style="display:flex; gap: 3px">
-                            <ReportModal page="0%" fn={reportPartner} color="dark" size="md"/>
+                            <ReportModal button_name="Report" modal_header="Report" page="0%" fn={reportPartner} color="dark" size="md"/>
                             <Button color="red" onclick={() => {abortModal = true}}>Abort</Button>
                             <Button color="green" onclick={() => {finishModal = true}}>Finish</Button>
                         </div>

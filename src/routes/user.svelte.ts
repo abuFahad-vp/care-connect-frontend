@@ -1,7 +1,6 @@
 import { goto } from '$app/navigation';
 import { invoke } from '@tauri-apps/api/core';
 import WebSocket from '@tauri-apps/plugin-websocket';
-import { chatData } from './chat/chat_data.svelte';
 
 export const user_data = $state({
     sessionToken: "",
@@ -11,7 +10,7 @@ export const user_data = $state({
     myIP: "",
     file: undefined as any,
     websocket: new WebSocket(0, [] as any),
-    chat_socket: new window.WebSocket("", [] as any),
+    chat_socket: new WebSocket(0, [] as any),
     data: {
       user_type: '',
       full_name: '',
@@ -24,21 +23,10 @@ export const user_data = $state({
       volunteer_credits: "",
       bio: '',
       profile_image: "",
-      // user_type: 'volunteer',
-      // full_name: 'v1',
-      // email: 'v1@v.com',
-      // password: 'vvvvvvvv',
-      // confirm_password: 'vvvvvvvv',
-      // dob: '2002-04-12',
-      // contact_number: '+9194945563234',
-      // location: '10.0123,72.0123',
-      // volunteer_credits: "0",
-      // bio: 'Nice to meet you',
-      // profile_image: "asdjfajjasdfj34j3j4kj",
     },
 })
 
-export async function login(email: string, password: string, redirect: string, fetch_custom?: any) {
+export async function login(email: string, password: string, redirect: string, ping_timeout: number) {
 
   let return_response = {
     result: false,
@@ -47,37 +35,27 @@ export async function login(email: string, password: string, redirect: string, f
   };
 
   try {
-
-    let serverIP = await get_server_ip();
-
-    if (serverIP === "") {
-      return_response.error_msg = "Network error"
-      return return_response;
+    if (user_data.serverIP === "") {
+      let count = 0;
+      while (user_data.serverIP === "" && count < 5) {
+        await get_server_ip(ping_timeout);
+        count += 1;
+      }
     }
 
-    user_data.serverIP = serverIP;
+    if (user_data.serverIP === "") {
+       return_response.error_msg = "Network error"
+       return return_response;
+    }
 
     const formData = new FormData();
     formData.append("username", email);
     formData.append("password", password);
-    let response: any;
 
-    // if (user_data.serverIP === "") {
-    //     return_response.error_msg = "Network error"
-    //     return return_response;
-    // }
-
-    if (fetch_custom) {
-      response = await fetch_custom(`http://${user_data.serverIP}:8000/token`, {
-        method: "POST",
-        body: formData
-      });
-    } else {
-      response = await fetch(`http://${user_data.serverIP}:8000/token`, {
-        method: "POST",
-        body: formData
-      });
-    }
+    let response = await fetch(`http://${user_data.serverIP}:8000/token`, {
+      method: "POST",
+      body: formData
+    });
 
     if (response.ok) {
 
@@ -97,18 +75,8 @@ export async function login(email: string, password: string, redirect: string, f
       let ws = await WebSocket.connect(`ws://${user_data.serverIP}:8000/ws?token=${user_data.sessionToken}`);
       user_data.websocket = ws;
 
-      const socket = new window.WebSocket(`ws://${user_data.serverIP}:8000/chat/${user_data.data.email}`);
-      socket.onopen = () => {
-        console.log('WebSocket connection established')
-      }
-      socket.onclose = () => {
-        console.log("WebSocket connection closed");
-      }
-      socket.onerror = (error) => {
-        console.error('Websocket error: ', error);
-      }
+      const socket = await WebSocket.connect(`ws://${user_data.serverIP}:8000/chat/${user_data.data.email}`);
       user_data.chat_socket = socket;
-      chatData.socket = socket;
 
       if (redirect !== "") {
         goto(redirect);
@@ -130,7 +98,7 @@ export async function login(email: string, password: string, redirect: string, f
   }
 }
 
-export async function get_server_ip(): Promise<string> {
+export async function get_server_ip(timeout = 150): Promise<string> {
   try {
     user_data.searchingIP = true;
 
@@ -146,7 +114,7 @@ export async function get_server_ip(): Promise<string> {
       const batch = ips.slice(i, i + BATCH_SIZE);
       const results = await Promise.all(
         batch.map(async (ip) => {
-          const isPinged = await ping(ip);
+          const isPinged = await ping(ip, timeout);
           return isPinged ? ip : null;
         })
       );
@@ -155,6 +123,7 @@ export async function get_server_ip(): Promise<string> {
       if (validIp) {
         user_data.searchingIP = false;
         console.log("SERVER IP FOUND:", validIp);
+        user_data.serverIP = validIp;
         return validIp;
         // user_data.serverURL = `http://${user_data.serverIP}:8000`;
       }

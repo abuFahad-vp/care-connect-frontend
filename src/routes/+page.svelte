@@ -6,6 +6,8 @@
     let showPassword = $state(false);
     let error_msg = $state("");
     let isLoading = $state(false);
+    let showIPInput = $state(false);
+    let ping_timeout = $state(150);
 
     const togglePasswordVisibility = () => {
       showPassword = !showPassword;
@@ -19,13 +21,14 @@
       let password = formData.get("password") as string;
 
       let redirect;
+
       if (username === "admin@admin.com") {
         redirect = "/admin"
       } else {
         redirect = "/home"
       }
 
-      const response = await login(username, password, redirect);
+      const response = await login(username, password, redirect, ping_timeout);
       if (response?.result) {
         console.log("Successfully logged");
         return
@@ -33,7 +36,6 @@
       error_msg = response?.error_msg as string;
       isLoading = false;
   }
-  let showIPInput = $state(false);
 </script>
 
 <main>
@@ -43,8 +45,12 @@
   <div class="background2"></div>
   <div class="banner">
   {#if showIPInput}
-  <input type="text" bind:value={user_data.myIP}>
-  <input type="text" bind:value={user_data.serverIP}>
+  <lable for="my_ip">Your IP: </lable>
+  <input id="my_ip" type="text" bind:value={user_data.myIP}>
+  <lable for="server_ip">Server IP: </lable>
+  <input id="server_ip" type="text" bind:value={user_data.serverIP}>
+  <lable for="ping_timeout">Ping timout: </lable>
+  <input id="ping_timeout" type="number" bind:value={ping_timeout}>
   <button onclick={() => showIPInput = false}>close</button>
   {:else}
   <button onclick={() => showIPInput = true}>.</button>
@@ -82,7 +88,7 @@
         Login
       {/if}
     </button>
-    <a class="signup-button" href="/signup">New Usesr? Signup</a>
+    <a class="signup-button" href="/signup">New User? Signup</a>
   </form>
 </main>
 

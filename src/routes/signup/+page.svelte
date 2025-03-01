@@ -8,7 +8,6 @@
     import Background from '../Background.svelte';
     import parsePhoneNumberFromString from 'libphonenumber-js';
     import { onMount } from 'svelte';
-    import { fetch  as fetch_t } from '@tauri-apps/plugin-http';
 
     onMount(() => {
 
@@ -32,19 +31,6 @@
         });
     });
 
-    // let formData = $state({
-    //     user_type: 'volunteer',
-    //     full_name: 'v5',
-    //     email: 'v5@v.com',
-    //     password: 'vvvvvvvv',
-    //     confirm_password: 'vvvvvvvv',
-    //     dob: '01-01-2006',
-    //     contact_number: '+919876543210',
-    //     bio: 'nil',
-    //     location: '',
-    //     profile_image: new File([], ""),
-    // });
-
     let formData = $state({
         user_type: 'volunteer',
         full_name: '',
@@ -66,7 +52,7 @@
     let isSignupLoading = $state(false);
     let serverIP = $state("");
     let showIPInput = $state(false);
-    let fileInput: HTMLInputElement; 
+    let ping_timeout = $state(150);
 
     const getLocation = async (event: MouseEvent) => {
         event.preventDefault();
@@ -117,12 +103,6 @@
         } catch (error) {
             return false;
         }
-        // const regex = /^\+?\d{9,15}$/;
-        // if (!regex.test(formData.contact_number)) {
-        //     error_msg = "Invalid contact number"
-        //     return false;
-        // }
-        // return true
     }
 
     function validateDOB() {
@@ -150,42 +130,27 @@
         return true
     }
 
-    async function refetch(url: string, options = {}, retry = 0) {
-        try {
-            const res = await fetch_t(url, options);
-            if (res.status == 429) throw "Throttling"
-            if (res.status >= 500) throw "Transient error"
-            return res;
-        } catch (error) {
-            if (retry++ > 5) throw error;
-            await new Promise(resolve => setTimeout(resolve, 500));
-            return refetch(url, options, retry);
-        }
-    }
-
     async function onsubmit(event: SubmitEvent) {
         event.preventDefault();
         isSignupLoading = true;
         error_msg = "";
 
-        let new_serverIP = await get_server_ip();
-
-        if (serverIP === "" && new_serverIP !== "") {
-            serverIP = new_serverIP
+        if (user_data.serverIP === "") {
+          let count = 0;
+          while (user_data.serverIP === "" && count < 5) {
+            await get_server_ip(ping_timeout);
+            count += 1;
+          }
         }
 
-        if (serverIP === "") {
-            isSignupLoading = false;
-            error_msg = "Failed to find the IP of server.";
-            // const fileInput = document.querySelector('#profile_image') as HTMLInputElement;
-            // if (fileInput) fileInput.value = '';
-            // profile_image = null;
-            profileReset();
-            return
+        if (user_data.serverIP === "") {
+          isSignupLoading = false;
+          error_msg = "Failed to find the IP of server.";
+          return
         }
 
         if (validateForm()) {
-            const signup_url = `http://${serverIP}:8000/signup`;
+            const signup_url = `http://${user_data.serverIP}:8000/signup`;
             try {
 
                 const formDataRequest = new FormData();
@@ -214,7 +179,6 @@
                     console.log("Signup successfull:", data);
                     error_msg = "";
                     success_msg = "Registration successful. redirecting to login";
-                    profileReset();
                     await sleep(1000);
                     goto('/')
                 } else {
@@ -232,23 +196,9 @@
                 console.error("Error during login:", error.message);
             } finally {
                 isSignupLoading = false;
-                profileReset();
-                // const fileInput = document.querySelector('#profile_image') as HTMLInputElement;
-                // if (fileInput) fileInput.value = '';
-                // profile_image = null;
             }
         } else {
             isSignupLoading = false;
-            // const fileInput = document.querySelector('#profile_image') as HTMLInputElement;
-            // if (fileInput) fileInput.value = '';
-            // profile_image = null;
-            profileReset();
-        }
-    }
-
-    function handleFormChange(event: Event) {
-        if (event.target !== fileInput) {
-            profileReset();
         }
     }
 
@@ -272,12 +222,6 @@
             }
         }
     }
-
-    function profileReset() {
-        // const fileInput = document.querySelector('#profile_image') as HTMLInputElement;
-        if (fileInput) fileInput.value = '';
-        profile_image = null;
-    }
 </script>
 
 <main>
@@ -287,13 +231,19 @@
     <div class="background2"></div>
         <a href="/" class="back-link">←</a>
         {#if showIPInput}
-        <input type="text" bind:value={user_data.myIP}>
-        <input type="text" bind:value={serverIP}>
-        <button onclick={() => showIPInput = false}>close</button>
+        <div style="display: flex; flex-direction: column;">
+          <lable for="my_ip">Your IP: </lable>
+          <input id="my_ip" type="text" bind:value={user_data.myIP}>
+          <lable for="server_ip">Server IP: </lable>
+          <input id="server_ip" type="text" bind:value={user_data.serverIP}>
+          <lable for="ping_timeout">Ping timout: </lable>
+          <input id="ping_timeout" type="number" bind:value={ping_timeout}>
+          <button onclick={() => showIPInput = false}>close</button>
+        </div>
         {:else}
         <button style="background-color: transparent; color:black" onclick={() => showIPInput = true}>.</button>
         {/if}
-        <form class="signup-form" {onsubmit} onchange={handleFormChange}>
+        <form class="signup-form" {onsubmit}>
             <div class="form-group">
                 <label for="">User Type</label>
                 <div class="radio-group">
@@ -404,6 +354,16 @@
                 </div>
             </div>
             <div class="form-group">
+                <label for="profile_image">Profile Image</label>
+                <input 
+                    type="file" 
+                    id="profile_image" 
+                    name="profile_image" 
+                    onchange={handleFileChange}
+                    required
+                >
+            </div>
+            <div class="form-group">
                 <label for="bio">Bio</label>
                 <textarea 
                     id="bio" 
@@ -413,17 +373,6 @@
                     rows="5"
                     required
                 ></textarea>
-            </div>
-            <div class="form-group">
-                <label for="profile_image">Profile Image</label>
-                <input 
-                    type="file" 
-                    id="profile_image" 
-                    name="profile_image" 
-                    bind:this={fileInput}
-                    onchange={handleFileChange}
-                    required
-                >
             </div>
             <div class="form-group">
                 <p class="error-msg" style="color: red;">{error_msg}</p>

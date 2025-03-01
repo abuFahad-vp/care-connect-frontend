@@ -79,18 +79,22 @@
         };
 
         messages.push(new_message);
-        chatData.socket?.send(JSON.stringify(new_message));
+        user_data.chat_socket.send(JSON.stringify(new_message));
         content = "";
         resizeTextarea();
     }
-    
-    if (chatData.socket !== undefined) {
-      chatData.socket.onmessage = (event) => {
-        console.log('Message recieved: ', event.data);
-        const data = JSON.parse(event.data);
-        data.timestamp = new Date(data.timestamp);
-        messages.push(data);
-      }
+
+    try {
+      user_data.chat_socket.addListener((msg) => {
+          if (msg.type === "Text") {
+              console.log('Message recieved: ', msg.data);
+              const data = JSON.parse(msg.data)
+              data.timestamp = new Date(data.timestamp);
+              messages.push(data);
+          }
+      })
+    } catch (error) {
+      console.log("ERROR: ", error);
     }
 
     function resizeTextarea() {

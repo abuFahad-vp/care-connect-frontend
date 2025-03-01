@@ -534,7 +534,7 @@
                             >
                                 Abort
                         </Button>
-                        <ReportModal page="0%" fn={reportPartner} color="dark" size="sm"/>
+                        <ReportModal button_name="Report" modal_header="Report" page="0%" fn={reportPartner} color="dark" size="sm"/>
                         </div>
                     {/if}
                 {/if}

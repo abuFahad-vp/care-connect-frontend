@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Button, Input, Label, Modal } from "flowbite-svelte";
+    import { Button, Input, Label} from "flowbite-svelte";
     import { user_data } from "../../user.svelte";
     import ProfileView from "../ProfileView.svelte";
     import { record_contract, unassign, type recordForm } from "./recordData.svelte";
@@ -186,7 +186,7 @@
                         <Button size="xs" onclick={() => {isNewRequest = false; unassign()}} color="red">Unassign</Button>
                     </div>
                     <div>
-                        <ReportModal page="100%" fn={reportPartner} color="dark" size="xs"/>
+                        <ReportModal button_name="Report" modal_header="Report" page="100%" fn={reportPartner} color="dark" size="xs"/>
                     </div>
                 </div>
             {/if}

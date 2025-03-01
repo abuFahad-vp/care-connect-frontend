@@ -4,7 +4,6 @@ export let chatData = $state<ChatData>({
     email: "",
     profile_image: "",
   },
-  socket: undefined,
   service_id: "",
   ip: "",
 })
@@ -17,7 +16,6 @@ export interface PartnerProfile {
 
 export interface ChatData {
   partner_profile: PartnerProfile;
-  socket: WebSocket | undefined;
   service_id: string
   ip: string
 }

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Button, Input, Label, Textarea } from "flowbite-svelte";
+    import { Button, Input, Label } from "flowbite-svelte";
     import { getPartner, record_contract, unassign, type recordForm } from "./recordData.svelte";
     import LoadingSpinner from "../../LoadingSpinner.svelte";
     import { sleep, user_data } from "../../user.svelte";
@@ -11,8 +11,6 @@
 
     let showProfile = $state(false);
     let record_form = $state([] as recordForm[]);
-    let feedbackText = $state("");
-    let feedbackMsg = $state("");
     let isShowChat = $state(false);
 
     user_data.websocket.addListener(async (msg) => {
@@ -92,6 +90,15 @@
             return `Failed to report the ${record_contract.partner_profile.user_type}`
         }
     }
+
+    async function submitFeedback(msg: string): Promise<string> {
+        let status = await reportUser(msg, record_contract.partner_profile.email, "Weekend service feedback");
+        if (status) {
+            return `Thank you for your feedback`
+        } else {
+            return `Failed to send the feedback`
+        }
+    }
 </script>
 
 <main class="main-container">
@@ -127,7 +134,7 @@
                         <Button size="xs" onclick={() => {unassign()}} color="red">Unassign</Button>
                     </div> -->
                     <div>
-                        <ReportModal page="100%" fn={reportPartner} color="dark" size="xs"/>
+                        <ReportModal modal_header="Report" button_name="Report" page="100%" fn={reportPartner} color="dark" size="xs"/>
                     </div>
                 </div>
             {/if}
@@ -143,18 +150,7 @@
                         <Input readonly={true} type="text" placeholder={`remarks on ${field.title}`} bind:value={field.remarks}></Input>
                     </div>
                 {/each}
-                <Label>Feedback</Label>
-                <Textarea rows={3} bind:value={feedbackText} placeholder="Enter your feedback"></Textarea>
-                <p style="color: orange">{feedbackMsg}</p>
-                <Button onclick={async () => {
-                    feedbackMsg = "";
-                    let status = await reportUser(feedbackText, record_contract.partner_profile.email, "Weekend service feedback");
-                    if (status) {
-                        feedbackMsg = "Successfully sented the feedback";
-                    } else {
-                        feedbackMsg = "Failed to sent the feedback";
-                    }
-                }}>Submit the feedback</Button>
+                <ReportModal modal_header="Feedback" button_name="Feedback" page="100%" fn={submitFeedback} color="primary" size="xs"/>
             </form>
         </div>
     {:else if record_contract.is_requesting}
@@ -251,5 +247,4 @@
         align-items: center;
         justify-content: center;
     }
-
 </style>
