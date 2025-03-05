@@ -3,6 +3,10 @@
     import { user_data } from "../../user.svelte";
     import ProfileView from "../ProfileView.svelte";
     import { OpenDoorSolid } from "flowbite-svelte-icons";
+    import WebSocket from '@tauri-apps/plugin-websocket';
+    import { record_contract } from "../records/recordData.svelte";
+    import { pageData } from "../page_state.svelte";
+    import { service_requests } from "../services/elder/service_data.svelte";
 
 </script>
 
@@ -11,7 +15,36 @@
         <ProfileView formData={user_data.data}/>
         <div class="logout">
             <OpenDoorSolid />
-            <button onclick={(e) => goto("/")}>logout</button>
+            <button onclick={
+              (e) => {
+                service_requests.requests = [];
+                pageData.currentPageIndex = 0;
+
+                record_contract.service_id = "";
+                record_contract.is_assigned = false;
+                record_contract.is_requesting = false;
+                record_contract.partner_profile = {};
+
+                user_data.file = undefined as any;
+                user_data.websocket = new WebSocket(0, [] as any),
+                user_data.chat_socket = new WebSocket(0, [] as any),
+                user_data.sessionToken = "",
+                user_data.data = {
+                      user_type: '',
+                      full_name: '',
+                      email: '',
+                      password: '',
+                      confirm_password: '',
+                      dob: '',
+                      contact_number: '',
+                      location: '',
+                      volunteer_credits: "",
+                      bio: '',
+                      profile_image: "",
+                }
+                goto("/")
+              }
+            }>logout</button>
         </div>
     </div>
 </main>
