@@ -62,6 +62,7 @@
     }
 
     function handleSend() {
+        textarea.focus()
         keyboardVisible = true;
         if (content.trim() === "") {
             content = "";
@@ -108,7 +109,7 @@
 
 <div
     class="flex flex-col bg-white"
-    style="height: {keyboardVisible ? viewportHeight + 'px' : '100vh'};"
+    style="height: 100vh;"
 >
     <ChatHeader user={currentUser} bind:show={show} />
 
@@ -127,7 +128,7 @@
 
     <div
         class="px-4 py-3 border-t bg-white transition-all duration-300"
-        style="margin-bottom: {keyboardVisible ? '270px': '0'};"
+        style="margin-bottom: 0;"
     >
         <div class="flex items-center gap-2">
             {#if keyboardVisible}
