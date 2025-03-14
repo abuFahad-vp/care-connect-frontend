@@ -503,7 +503,7 @@
                     </div>
                 {:else if formData.isAccepted}
                     {#if !formData.isTaskStarted}
-                    <p>Task is not started. it will start in {formData.startTimeRemaining}</p>
+                    <p style="padding-bottom: 15px; margin-bottom: 10px;">The task hasn't started yet. It will begin in {formData.startTimeRemaining}</p>
                     {:else}
                         <div class="progress-div">
                             {#if formData.timeExceeded}

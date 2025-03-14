@@ -13,11 +13,12 @@
     let showProfile = $state(false);
     let showUpdatedModal = $state(false);
     let isShowChat = $state(false);
+    let updateMsg = $state("");
+    let updateColor = $state("green")
 
     onMount(() => {
 
         const inputsAndTextareas = document.querySelectorAll('input, textarea');
-        const form = document.querySelector('form');
 
         inputsAndTextareas.forEach(element => {
             element.addEventListener('focus', () => {
@@ -85,6 +86,7 @@
         },
     ]);
 
+    let previous_form = JSON.stringify(record_form);
     try {
       user_data.websocket.addListener((msg) => {
           if (msg.type == "Text") {
@@ -103,6 +105,12 @@
 
     async function updateRecord() {
         try {
+            if (JSON.stringify(record_form) === previous_form) {
+                showUpdatedModal = true;
+                updateColor = "red"
+                updateMsg = "Nothing to update!!!"
+                return
+            }
             let formData = new FormData();
             formData.append("data", JSON.stringify(record_form));
             let response = await fetch(`${user_data.serverURL}/volunteer/update_record`, {
@@ -115,11 +123,25 @@
             });
             if (response.ok) {
                 showUpdatedModal = true;
+                updateColor = "green"
+                updateMsg = "Record successfully updated"
+                previous_form = JSON.stringify(record_form);
                 console.log("DONE");
+            }else if (response.status === 401 ) {
+                showUpdatedModal = true;
+                updateColor = "orange"
+                updateMsg = "Wait for a couple of seconds.";
+                console.log("Wait for a couple of seconds.");
             } else {
+                showUpdatedModal = true;
+                updateColor = "red"
+                updateMsg = "Failed to update the record";
                 console.log("Failed to update the record");
             }
         } catch (e: any) {
+            showUpdatedModal = true;
+            updateColor = "red"
+            updateMsg = "Failed to update the record";
             console.log("Error: ", e);
         }
     }
@@ -203,7 +225,7 @@
                     </div>
                 {/each}
                 {#if showUpdatedModal}
-                <p style="color: green; padding: 5px"><strong>Record successfully updated</strong></p>
+                <p style="color: {updateColor}; padding: 5px"><strong>{updateMsg}</strong></p>
                 {/if}
                 <Button onclick={updateRecord}>Update</Button>
             </form>

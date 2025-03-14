@@ -231,7 +231,7 @@
                 </div>
             {:else if requestForm.volunteer_accepted && requestForm.elder_accepted}
                 {#if !requestForm.isTaskStarted}
-                <p>Task is not started. it will start in {requestForm.startTimeRemaining}</p>
+                <p>The task hasn't started yet. It will begin in {requestForm.startTimeRemaining}</p>
                 {:else}
                     <div class="progress-div">
                         {#if requestForm.timeExceeded}
