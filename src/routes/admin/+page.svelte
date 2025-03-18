@@ -5,8 +5,9 @@
     import Slider from "./Slider.svelte";
     import UserView from "./UserView.svelte";
     import AdminProfile from "./AdminProfile.svelte";
+    import UserApproval from "./UserApproval.svelte";
 
-    const pages = [ReportPage, UserView, AdminProfile];
+    const pages = [ReportPage, UserView, UserApproval, AdminProfile];
 
 </script>
 <div class="app-container">
@@ -51,6 +52,12 @@
                 Users
             </button>
             <button class="nav-button" onclick={(e) => {pageData.currentPageIndex = 2}} class:active={pageData.currentPageIndex === 2}>
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M12 4a4 4 0 0 1 4 4a4 4 0 0 1-4 4a4 4 0 0 1-4-4a4 4 0 0 1 4-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4"/>
+                </svg>
+               Approve Volunteer
+            </button>
+            <button class="nav-button" onclick={(e) => {pageData.currentPageIndex = 3}} class:active={pageData.currentPageIndex === 3}>
                 <svg class="nav-icon" viewBox="0 0 24 24">
                     <path fill="currentColor" d="M12 4a4 4 0 0 1 4 4a4 4 0 0 1-4 4a4 4 0 0 1-4-4a4 4 0 0 1 4-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4"/>
                 </svg>
@@ -133,7 +140,7 @@
         display: inline-block;
         color: rgb(147, 179, 138);
         text-decoration: none;
-        padding: 0.8rem 1.2rem;
+        padding: 0.5rem 0.7rem;
         background-color: transparent;
         border-radius: 20px;
         border-width: 0;

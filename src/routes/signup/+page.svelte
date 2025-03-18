@@ -9,26 +9,53 @@
     import parsePhoneNumberFromString from 'libphonenumber-js';
     import { onMount } from 'svelte';
 
-    onMount(() => {
+    let institutions = $state({});
 
-        const inputsAndTextareas = document.querySelectorAll('input, textarea');
-        // const form = document.querySelector('form');
+    onMount(async () => {
 
-        inputsAndTextareas.forEach(element => {
-            element.addEventListener('focus', () => {
-                // Add temporary padding to the body to make space for the keyboard
-                document.body.style.paddingBottom = '300px';
+      if (user_data.serverIP === "") {
+        let count = 0;
+        while (user_data.serverIP === "" && count < 5) {
+          await get_server_ip(ping_timeout);
+          count += 1;
+        }
+      }
 
-                setTimeout(() => {
-                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 300); // Delay for keyboard animation
-            });
+      if (user_data.serverIP === "") {
+        isSignupLoading = false;
+        error_msg = "Failed to find the IP of server.";
+      }
 
-            element.addEventListener('blur', () => {
-                // Remove the extra padding when the element loses focus
-                document.body.style.paddingBottom = '0';
-            });
-        });
+      try {
+        const signup_url = `http://${user_data.serverIP}:8000/user/get_institutions`;
+        const response = await fetch(signup_url, { method: "GET"});
+
+        if (response.ok) {
+          const data = await response.json();
+          institutions = data;
+          console.log(institutions);
+        }
+      } catch (e) {
+        console.log("ERROR: ", e)
+      }
+      const inputsAndTextareas = document.querySelectorAll('input, textarea');
+      // const form = document.querySelector('form');
+
+      inputsAndTextareas.forEach(element => {
+          element.addEventListener('focus', () => {
+              // Add temporary padding to the body to make space for the keyboard
+              document.body.style.paddingBottom = '300px';
+
+              setTimeout(() => {
+              element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }, 300); // Delay for keyboard animation
+          });
+
+          element.addEventListener('blur', () => {
+              // Remove the extra padding when the element loses focus
+              document.body.style.paddingBottom = '0';
+          });
+      });
     });
 
     let formData = $state({
@@ -316,7 +343,15 @@
                     required
                 >
             </div>
-
+          <div class="form-group">
+              <label for="institution">Select Institution:</label>
+              <select id="institution" name="institution">
+                  <option value="">-- Select an institution --</option>
+                  {#each Object.entries(institutions) as [email, name]}
+                      <option value={email}>{name}</option>
+                  {/each}
+              </select>
+          </div>
             <div class="form-group">
                 <label for="dob">Date of Birth</label>
                 <input 
@@ -444,6 +479,13 @@
         border: none;
         border-radius: 4px;
         cursor: pointer;
+        font-size: 1rem;
+    }
+
+    select {
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
         font-size: 1rem;
     }
 
