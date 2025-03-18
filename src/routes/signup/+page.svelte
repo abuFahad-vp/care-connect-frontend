@@ -348,7 +348,7 @@
               <select id="institution" name="institution">
                   <option value="">-- Select an institution --</option>
                   {#each Object.entries(institutions) as [email, name]}
-                      <option value={email}>{name}</option>
+                      <option value={name}>{name}</option>
                   {/each}
               </select>
           </div>
