@@ -68,6 +68,9 @@
         contact_number: '',
         bio: '',
         location: '',
+        institution_id: '',
+        institution: '',
+        approve: false,
     });
 
     let profile_image: File | null =  $state(null);
@@ -179,9 +182,9 @@
         if (validateForm()) {
             const signup_url = `http://${user_data.serverIP}:8000/signup`;
             try {
-
+                
+                formData.approve = formData.user_type === "elder";
                 const formDataRequest = new FormData();
-    
                 const formDataObject = formData as Record<string, string>;
 
                 Object.keys(formDataObject).forEach((key) => {
@@ -343,15 +346,28 @@
                     required
                 >
             </div>
-          <div class="form-group">
-              <label for="institution">Select Institution:</label>
-              <select id="institution" name="institution">
-                  <option value="">-- Select an institution --</option>
-                  {#each Object.entries(institutions) as [email, name]}
-                      <option value={name}>{name}</option>
-                  {/each}
-              </select>
-          </div>
+          {#if formData.user_type === "volunteer"}
+            <div class="form-group">
+                <label for="institution">Select Institution:</label>
+                <select id="institution" name="institution" bind:value={formData.institution}>
+                    <option value="">-- Select an institution --</option>
+                    {#each Object.entries(institutions) as [email, name]}
+                        <option value={name}>{name}</option>
+                    {/each}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="institution_id">Institution Id: </label>
+                  <input 
+                      type="text" 
+                      id="institution_id" 
+                      name="institution_id"
+                      bind:value={formData.institution_id}
+                      placeholder="Enter your Institution id" 
+                      required
+                  >
+            </div>
+          {/if}
             <div class="form-group">
                 <label for="dob">Date of Birth</label>
                 <input 
