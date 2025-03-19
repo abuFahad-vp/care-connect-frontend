@@ -111,10 +111,21 @@
         if (!validateDOB()) { return false }
         if (!validatePhone()) { return false }
         if (!validateLocation()) { return false }
+        if (!validateEmail()) { return false }
 
         error_msg = ""
         return true
     }
+
+    function validateEmail() {
+      const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+      if (!gmailRegex.test(formData.email)) {
+        error_msg = "Only support gmail"
+        return false
+      }
+      return true
+    }
+
     function validateLocation() {
         const regex = /^[-+]?\d{1,3}\.\d+,\s?[-+]?\d{1,3}\.\d+$/;
         console.log(formData.location)
