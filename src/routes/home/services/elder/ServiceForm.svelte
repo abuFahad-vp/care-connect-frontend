@@ -480,7 +480,10 @@
                 {/if}
 
                 {#if formData.status !== "pending" && formData.status !== "accepted" && formData.status !== "ongoing"}
-                <Button onclick={deleteForm} color="dark">Clear</Button>
+                <div style="display: flex; gap: 10px; padding-bottom: 1rem; margin-bottom:1rem;">
+                  <Button onclick={deleteForm} size="md" color="dark">Clear</Button>
+                  <ReportModal button_name="Report" modal_header="Report" page="0%" fn={reportPartner} color="red" size="md"/>
+                </div>
                 {:else if !formData.isSubmitting}
                     <div class="form-actions">
                         <button 

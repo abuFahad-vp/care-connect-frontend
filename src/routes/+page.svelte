@@ -1,17 +1,47 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
     import Background from './Background.svelte';
     import Navigation from './navigation.svelte';
-    import { login, user_data } from './user.svelte';
+    import { get_server_ip, login, user_data } from './user.svelte';
+    import { InspectIcon } from 'lucide-svelte';
 
     let showPassword = $state(false);
     let error_msg = $state("");
     let isLoading = $state(false);
     let showIPInput = $state(false);
     let ping_timeout = $state(150);
+    let institutions = $state({})
 
     const togglePasswordVisibility = () => {
       showPassword = !showPassword;
     };
+
+    onMount(async () => {
+      if (user_data.serverIP === "") {
+        let count = 0;
+        while (user_data.serverIP === "" && count < 5) {
+          await get_server_ip(ping_timeout);
+          count += 1;
+        }
+      }
+
+      if (user_data.serverIP === "") {
+        error_msg = "Failed to find the IP of server.";
+      }
+
+      try {
+        const signup_url = `http://${user_data.serverIP}:8000/user/get_institutions`;
+        const response = await fetch(signup_url, { method: "GET"});
+
+        if (response.ok) {
+          const data = await response.json();
+          institutions = data;
+          console.log(institutions);
+        }
+      } catch (e) {
+        console.log("ERROR: ", e)
+      }
+    });
 
     async function onsubmit(e: SubmitEvent) {
       isLoading = true;
@@ -20,12 +50,15 @@
       let username = formData.get("username") as string;
       let password = formData.get("password") as string;
 
-      let redirect;
+      let redirect = "";
 
-      if (username === "admin@admin.com") {
-        redirect = "/admin"
-      } else {
-        redirect = "/home"
+      for (let email in institutions) {
+        if (username === email) {
+          redirect = "/admin"
+          break
+        } else {
+          redirect = "/home"
+        }
       }
 
       const response = await login(username, password, redirect, ping_timeout);

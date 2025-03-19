@@ -1,6 +1,5 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    // import { user_data } from "../user.svelte";
     import ProfileView from "../home/ProfileView.svelte";
     import { Button, Input } from "flowbite-svelte";
     import Fuse from 'fuse.js';
@@ -8,10 +7,29 @@
     import { user_data } from "../user.svelte";
 
     let users = $state([] as any[]);
+    let institutions = $state({});
 
     const options = {
         keys: ['email', 'full_name'],
         threshold: 0.3
+    }
+
+    async function approveUser(email: string) {
+        try {
+            let response = await fetch(`${user_data.serverURL}/admin/approve/${email}`, {
+                method: "POST",
+                headers: {
+                    'Authorization': `Bearer ${user_data.sessionToken}`
+                },
+            });
+
+            if (response.ok) {
+                console.log(`Approval successfull`);
+                await getUsers();
+            }
+        } catch (e: any) {
+            console.log("ERROR: ", e);
+        }
     }
 
     async function deleteUser(email: string) {
@@ -45,9 +63,17 @@
 
     onMount(async () => {
         try {
+          const signup_url = `http://${user_data.serverIP}:8000/user/get_institutions`;
+          const response = await fetch(signup_url, { method: "GET"});
+
+          if (response.ok) {
+            const data = await response.json();
+            institutions = data;
+            console.log(institutions);
             await getUsers()
-        } catch (e: any) {
-            console.log("ERROR: ", e);
+          }
+        } catch (e) {
+          console.log("ERROR: ", e)
         }
     });
 
@@ -63,7 +89,10 @@
             if (response.ok) {
                 let responseData = await response.json() as any[];
                 console.log(responseData);
-                users = responseData.slice(1);
+                const captainEmails = new Set(Object.keys(institutions));
+                users = responseData.filter(user => 
+                    (user.user_type === "elder") || user.institution === user_data.data.institution && !captainEmails.has(user.email)
+                );
             }
         } catch (e: any) {
             console.log("ERROR: ", e);
@@ -88,7 +117,12 @@
         border-radius: 5%"
         >
             <ProfileView formData={user} />
-            <div>
+            <div style="display: flex; gap: 10px;">
+                {#if !user.approve && user.user_type === "volunteer"}
+                 <Button onclick={() => {approveUser(user.email)}} color="green">Approve the volunteer</Button>
+                {:else if user.user_type === "volunteer"}
+                 <Button disabled={true} color="alternative">Approved</Button>
+                {/if}
                 <Button onclick={() => {deleteUser(user.email)}} color="red"> Delete the user</Button>
             </div>
         </div>

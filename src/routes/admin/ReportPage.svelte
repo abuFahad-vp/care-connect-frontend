@@ -34,6 +34,25 @@
         }
     })
 
+    async function getUser(email: string) {
+        try {
+            let response = await fetch(`${user_data.serverURL}/admin/users/${email}`, {
+                method: "GET",
+                headers: {
+                    'Authorization': `Bearer ${user_data.sessionToken}`
+                },
+            });
+
+            if (response.ok) {
+                let responseData = await response.json();
+                return responseData;
+            }
+        } catch (e: any) {
+            console.log("ERROR: ", e);
+            return {}
+        }
+    }
+
     async function getFeedbacks() {
         try {
             let response = await fetch(`${user_data.serverURL}/admin/feedback`, {
@@ -42,11 +61,31 @@
                     'Authorization': `Bearer ${user_data.sessionToken}`
                 },
             });
-
             if (response.ok) {
                 let responseData = await response.json() as any[];
-                reports = customSort(responseData);
-                console.log(responseData);
+                let loggedUserInstitution = user_data.data.institution;
+
+                // Use Promise.all to resolve all async getUser() calls in parallel
+                let filteredReports = await Promise.all(responseData.map(async report => {
+                    let [reporter, reported] = await Promise.all([
+                        getUser(report.reporter_email),
+                        getUser(report.reported_email)
+                    ]);
+
+                    console.log("REPORTED: ", reported.institution);
+                    console.log("REPORTER: ", reporter.institution);
+                    console.log("Captain institution: ", loggedUserInstitution);
+
+                    // Return the report if either institution matches the logged user’s institution
+                    return (reporter.institution === loggedUserInstitution || reported.institution === loggedUserInstitution) 
+                        ? report 
+                        : null;
+                }));
+
+                // Remove null values
+                reports = customSort(filteredReports.filter(report => report !== null));
+
+                console.log("Response Data: ", reports);
             }
         } catch (e: any) {
             console.log("ERROR: ", e);

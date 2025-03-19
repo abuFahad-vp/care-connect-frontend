@@ -205,6 +205,7 @@
             <p class="time-period"><strong>To:</strong> {formatDateTime(service_form.time_period_to)}</p>
             <p class="contact-number"><strong>Contact No:</strong> {service_form.contact_number}</p>
             {#if service_form.status !== "pending" && service_form.status !== "accepted" && service_form.status !== "ongoing"}
+                <ReportModal button_name="Report" modal_header="Report" page="0%" fn={reportPartner} color="red" size="md"/>
                 <Button onclick={onclick_reject} color="dark">Clear</Button>
             {:else if !requestForm.volunteer_accepted}
                 <div class="submission-control">

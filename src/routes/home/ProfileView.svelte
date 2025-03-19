@@ -13,6 +13,10 @@
     <div class="profile-details">
         <p><strong>Email:</strong> {formData.email}</p>
         <p><strong>User Type:</strong> {formData.user_type}</p>
+        {#if formData.user_type === "volunteer"}
+          <p><strong>Institution:</strong> {formData.institution}</p>
+          <p><strong>Institution Id:</strong> {formData.institution_id}</p>
+        {/if}
         <p><strong>Age:</strong> {new Date().getFullYear() - 1 - formData.dob.slice(0,4)}</p>
         <p><strong>Date of Birth:</strong> {formData.dob}</p>
         <p><strong>Contact:</strong> {formData.contact_number}</p>

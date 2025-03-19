@@ -80,7 +80,6 @@
     let success_msg = $state("")
     let isLocationLoading = $state(false);
     let isSignupLoading = $state(false);
-    let serverIP = $state("");
     let showIPInput = $state(false);
     let ping_timeout = $state(150);
 

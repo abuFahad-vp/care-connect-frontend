@@ -17,6 +17,7 @@ export const user_data = $state({
       email: '',
       password: '',
       confirm_password: '',
+      institution: '',
       dob: '',
       contact_number: '',
       location: '',
@@ -67,6 +68,13 @@ export async function login(email: string, password: string, redirect: string, p
       user_data.sessionToken = data.access_token;
       user_data.data = data.data;
       user_data.serverURL = `http://${user_data.serverIP}:8000`;
+
+      if (!data.data.approve) {
+        console.error("Volunteer is not approved.");
+        return_response.result = false;
+        return_response.error_msg = "You're not approved by your captain";
+        return return_response;
+      }
 
       return_response.result = true;
       return_response.error_msg = "";

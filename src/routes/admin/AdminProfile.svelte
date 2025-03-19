@@ -1,11 +1,44 @@
-<script>
+<script lang="ts">
     import { goto } from "$app/navigation";
     import { Button } from "flowbite-svelte";
+    import WebSocket from "@tauri-apps/plugin-websocket";
+    import { user_data } from "../user.svelte";
+    import { pageData } from "./page_state.svelte";
+    import { service_requests } from "../home/services/elder/service_data.svelte";
+
 
 </script>
 <main class="main-container">
     <div>
-        <Button onclick={() => {goto("/")}}>Logout</Button>
+            <Button onclick={
+              async (e: any) => {
+                service_requests.requests = [];
+                pageData.currentPageIndex = 0;
+
+                user_data.file = undefined as any;
+
+                await user_data.websocket.disconnect();
+                await user_data.chat_socket.disconnect();
+
+                user_data.websocket = new WebSocket(0, [] as any),
+                user_data.chat_socket = new WebSocket(0, [] as any),
+                user_data.sessionToken = "",
+                user_data.data = {
+                      user_type: '',
+                      full_name: '',
+                      email: '',
+                      password: '',
+                      confirm_password: '',
+                      dob: '',
+                      contact_number: '',
+                      location: '',
+                      volunteer_credits: "",
+                      bio: '',
+                      profile_image: "",
+                }
+                goto("/")
+              }
+            }>logout</Button>
     </div>
 </main>
 

@@ -16,7 +16,7 @@
         <div class="logout">
             <OpenDoorSolid />
             <button onclick={
-              (e) => {
+              async (e) => {
                 service_requests.requests = [];
                 pageData.currentPageIndex = 0;
 
@@ -26,6 +26,10 @@
                 record_contract.partner_profile = {};
 
                 user_data.file = undefined as any;
+
+                await user_data.websocket.disconnect();
+                await user_data.chat_socket.disconnect();
+
                 user_data.websocket = new WebSocket(0, [] as any),
                 user_data.chat_socket = new WebSocket(0, [] as any),
                 user_data.sessionToken = "",
