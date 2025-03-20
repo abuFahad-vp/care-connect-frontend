@@ -206,7 +206,20 @@
             <p class="contact-number"><strong>Contact No:</strong> {service_form.contact_number}</p>
             {#if service_form.status !== "pending" && service_form.status !== "accepted" && service_form.status !== "ongoing"}
                 <ReportModal button_name="Report" modal_header="Report" page="0%" fn={reportPartner} color="red" size="md"/>
-                <Button onclick={onclick_reject} color="dark">Clear</Button>
+                <Button style="padding-bottom: 1rem; margin-bottom: 2rem;" onclick={onclick_reject} color="dark">Clear</Button>
+                <div class="controls">
+                    <button class="expand-button" aria-label="expand-collapse" onclick={expandOrCollapse}>
+                        {#if !requestForm.expanded}
+                            <svg style="transform: rotate(180deg)" width="30px" height="30px" viewBox="0 0 24 24" fill="none">
+                                <path d="M18 15L12 9L6 15" stroke="#33363F" stroke-width="2"/>
+                            </svg>
+                        {:else}
+                            <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none">
+                                <path d="M18 15L12 9L6 15" stroke="#33363F" stroke-width="2"/>
+                            </svg>
+                        {/if}
+                    </button>
+                </div>
             {:else if !requestForm.volunteer_accepted}
                 <div class="submission-control">
                     <button class="reject styled-button" onclick={onclick_reject}>Reject</button>
@@ -463,5 +476,15 @@
         align-items: center;
         justify-content: center;
         padding-bottom: 10px;
+    }
+
+    .controls {
+      position: absolute;
+      bottom: 1%;
+      right: 45%;
+      display: flex;
+      gap: 8px;
+      padding-top: 1rem;
+      margin-top: 1rem;
     }
 </style>
