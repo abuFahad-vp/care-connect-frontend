@@ -83,8 +83,8 @@
           if (response.ok) {
             const data = await response.json();
             institutions = data;
+            await getUsers();
             console.log(institutions);
-            await getUsers()
           }
         } catch (e) {
           console.log("ERROR: ", e)
@@ -93,7 +93,7 @@
 
     async function getUsers() {
         try {
-            let response = await fetch(`${user_data.serverURL}/admin/users`, {
+            let response = await fetch(`${user_data.serverURL}/admin/get_all_users`, {
                 method: "GET",
                 headers: {
                     'Authorization': `Bearer ${user_data.sessionToken}`

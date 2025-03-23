@@ -12,14 +12,17 @@
     <div>
             <Button onclick={
               async (e: any) => {
-                goto("/")
                 service_requests.requests = [];
                 pageData.currentPageIndex = 0;
 
                 user_data.file = undefined as any;
 
-                await user_data.websocket.disconnect();
-                await user_data.chat_socket.disconnect();
+                try {
+                  await user_data.websocket.disconnect();
+                  await user_data.chat_socket.disconnect();
+                } catch (e: any) {
+                  console.log("Already closed");
+                }
 
                 user_data.websocket = new WebSocket(0, [] as any),
                 user_data.chat_socket = new WebSocket(0, [] as any),
@@ -38,6 +41,7 @@
                       bio: '',
                       profile_image: "",
                 }
+                goto("/")
               }
             }>logout</Button>
     </div>

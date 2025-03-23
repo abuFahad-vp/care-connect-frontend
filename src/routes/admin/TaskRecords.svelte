@@ -138,12 +138,16 @@
     })
 
     onMount(async () => {
-      try {
-        await getTasks();
-        await getRecords();
-      } catch (e) {
-        console.log("ERROR: ", e)
+      async function retryTask(attempt = 1) {
+        try {
+          await getTasks();
+          await getRecords();
+        } catch (e) {
+          console.log(`ERROR (Attempt ${attempt}): `, e);
+          setTimeout(() => retryTask(attempt + 1), 1000);
+        }
       }
+      retryTask();
     });
     
     async function getUser(email: string) {

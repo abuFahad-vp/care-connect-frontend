@@ -20,8 +20,8 @@
                 <OpenDoorSolid />
                 <button onclick={
                   async (e) => {
-                    goto("/")
                     service_requests.requests = [];
+                    pageData.serviceRequestsArray = [];
                     pageData.currentPageIndex = 0;
 
                     record_contract.service_id = "";
@@ -30,9 +30,13 @@
                     record_contract.partner_profile = {};
 
                     user_data.file = undefined as any;
+                    try {
+                      await user_data.websocket.disconnect();
+                      await user_data.chat_socket.disconnect();
+                    } catch (e: any) {
+                      console.log("Already closed");
+                    }
 
-                    await user_data.websocket.disconnect();
-                    await user_data.chat_socket.disconnect();
 
                     user_data.websocket = new WebSocket(0, [] as any),
                     user_data.chat_socket = new WebSocket(0, [] as any),
@@ -51,6 +55,7 @@
                           bio: '',
                           profile_image: "",
                     }
+                    goto("/")
                   }
                 }>logout</button>
             </div>
