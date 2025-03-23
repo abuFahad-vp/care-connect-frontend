@@ -95,6 +95,8 @@
     function viewProfile(email: string, type: string) {
         pageData.searchKeyword = email
         pageData.currentPageIndex = 1;
+        pageData.showElder = true;
+        pageData.showVolunteer = true;
     }
 
     async function updateStatus(id: number, newStatus: string) {

@@ -50,15 +50,29 @@
         }
     }
 
-
     function listOfUsers() {
-        // return []
-        if (pageData.searchKeyword === "") {
-            return users;
+        let filteredUsers = users;
+        if (pageData.searchKeyword !== "") {
+            const fuse = new Fuse(users, options);
+            const searchResults = fuse.search(pageData.searchKeyword);
+            filteredUsers = searchResults.map(result => result.item);
         }
-        const fuse = new Fuse(users, options);
-        const searchResults = fuse.search(pageData.searchKeyword);
-        return searchResults.map(result => result.item);
+        
+        return filteredUsers.filter(user => {
+            if (!pageData.showVolunteer && !pageData.showElder) {
+                return false;
+            }
+            
+            if (user.user_type === "volunteer" && pageData.showVolunteer) {
+                return true;
+            }
+            
+            if (user.user_type === "elder" && pageData.showElder) {
+                return true;
+            }
+            
+            return false;
+        });
     }
 
     onMount(async () => {
@@ -104,6 +118,27 @@
 <main class="main-container">
     <div style="margin: 30px 0" class="search">
         <Input type="search" placeholder="search" bind:value={pageData.searchKeyword}/>
+    </div>
+    <div class="flex items-center space-x-2 mb-3">
+      <label for="volunteer" class="text-sm font-medium cursor-pointer text-gray-700">Show volunteer</label>
+      <input 
+          type="checkbox" 
+          bind:checked={pageData.showVolunteer} 
+          id="volunteer" 
+          name="volunteer"
+          class="w-4 h-4 accent-indigo-600 rounded focus:ring-2 focus:ring-indigo-500"
+      >
+    </div>
+
+    <div class="flex items-center space-x-2 mb-3">
+      <label for="elder" class="text-sm font-medium cursor-pointer text-gray-700">Show elder</label>
+      <input 
+          type="checkbox" 
+          bind:checked={pageData.showElder} 
+          id="elder" 
+          name="elder"
+          class="w-4 h-4 accent-indigo-600 rounded focus:ring-2 focus:ring-indigo-500"
+      >
     </div>
     {#if listOfUsers().length === 0}
         <div style="opacity: 0.8; align-self: center; justify-self: center">

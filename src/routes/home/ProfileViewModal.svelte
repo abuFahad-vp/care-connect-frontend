@@ -24,6 +24,7 @@
     <div style="display: flex; flex-direction: column; align-items: center">
         <img style="border-radius: 50%; width: 80px; height: 80px; margin: 5px" src={displayImage(formData.profile_image)} alt="profile">
         <p style="padding: 4px;"><strong>{formData.full_name}</strong></p>
+        <p style="padding: 4px;">{formData.user_type}</p>
         <Button size="xs" color="dark" onclick={() => showModal = true}>View profile</Button>
     </div>
 {/if}

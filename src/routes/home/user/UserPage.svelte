@@ -7,50 +7,59 @@
     import { record_contract } from "../records/recordData.svelte";
     import { pageData } from "../page_state.svelte";
     import { service_requests } from "../services/elder/service_data.svelte";
-
+    import { Tabs, TabItem } from 'flowbite-svelte';
+    import TaskRecords from "../../admin/TaskRecords.svelte";
 </script>
 
 <main class="main-container">
-    <div class="user-profile">
-        <ProfileView formData={user_data.data}/>
-        <div class="logout">
-            <OpenDoorSolid />
-            <button onclick={
-              async (e) => {
-                service_requests.requests = [];
-                pageData.currentPageIndex = 0;
+  <Tabs tabStyle="underline">
+      <TabItem open title="Profile">
+        <div class="user-profile">
+            <ProfileView formData={user_data.data}/>
+            <div class="logout">
+                <OpenDoorSolid />
+                <button onclick={
+                  async (e) => {
+                    goto("/")
+                    service_requests.requests = [];
+                    pageData.currentPageIndex = 0;
 
-                record_contract.service_id = "";
-                record_contract.is_assigned = false;
-                record_contract.is_requesting = false;
-                record_contract.partner_profile = {};
+                    record_contract.service_id = "";
+                    record_contract.is_assigned = false;
+                    record_contract.is_requesting = false;
+                    record_contract.partner_profile = {};
 
-                user_data.file = undefined as any;
+                    user_data.file = undefined as any;
 
-                await user_data.websocket.disconnect();
-                await user_data.chat_socket.disconnect();
+                    await user_data.websocket.disconnect();
+                    await user_data.chat_socket.disconnect();
 
-                user_data.websocket = new WebSocket(0, [] as any),
-                user_data.chat_socket = new WebSocket(0, [] as any),
-                user_data.sessionToken = "",
-                user_data.data = {
-                      user_type: '',
-                      full_name: '',
-                      email: '',
-                      password: '',
-                      confirm_password: '',
-                      dob: '',
-                      contact_number: '',
-                      location: '',
-                      volunteer_credits: "",
-                      bio: '',
-                      profile_image: "",
-                }
-                goto("/")
-              }
-            }>logout</button>
+                    user_data.websocket = new WebSocket(0, [] as any),
+                    user_data.chat_socket = new WebSocket(0, [] as any),
+                    user_data.sessionToken = "",
+                    user_data.data = {
+                          institution: '',
+                          user_type: '',
+                          full_name: '',
+                          email: '',
+                          password: '',
+                          confirm_password: '',
+                          dob: '',
+                          contact_number: '',
+                          location: '',
+                          volunteer_credits: "",
+                          bio: '',
+                          profile_image: "",
+                    }
+                  }
+                }>logout</button>
+            </div>
         </div>
-    </div>
+      </TabItem>
+    <TabItem title="Activity Logs">
+      <TaskRecords />
+    </TabItem>
+  </Tabs>
 </main>
 
 <style>

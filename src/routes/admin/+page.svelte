@@ -5,9 +5,9 @@
     import Slider from "./Slider.svelte";
     import UserView from "./UserView.svelte";
     import AdminProfile from "./AdminProfile.svelte";
-    import UserApproval from "./UserApproval.svelte";
+    import TaskRecords from "./TaskRecords.svelte";
 
-    const pages = [ReportPage, UserView, UserApproval, AdminProfile];
+    const pages = [ReportPage, UserView, TaskRecords, AdminProfile];
 
 </script>
 <div class="app-container">
@@ -52,10 +52,49 @@
                 Users
             </button>
             <button class="nav-button" onclick={(e) => {pageData.currentPageIndex = 2}} class:active={pageData.currentPageIndex === 2}>
-                <svg class="nav-icon" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M12 4a4 4 0 0 1 4 4a4 4 0 0 1-4 4a4 4 0 0 1-4-4a4 4 0 0 1 4-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4"/>
-                </svg>
-               Approve Volunteer
+              <svg class="nav-icon" fill="#000000" version="1.1" id="Layer_1" viewBox="0 0 512 512" xml:space="preserve">
+              <g>
+                <g>
+                  <path d="M369.44,0H141.889C97.971,0,62.578,36.182,62.578,80.108v352.675c0,43.927,35.393,79.217,79.311,79.217H369.44    c43.917,0,79.982-35.29,79.982-79.217V80.108C449.422,36.182,413.357,0,369.44,0z M426.667,432.783    c0,31.379-25.857,56.461-57.227,56.461H141.889c-31.371,0-56.556-25.082-56.556-56.461V80.108    c0-31.379,25.185-57.353,56.556-57.353H369.44c31.37,0,57.227,25.973,57.227,57.353V432.783z"/>
+                </g>
+              </g>
+              <g>
+                <g>
+                  <rect x="153.6" y="56.889" width="204.8" height="22.756"/>
+                </g>
+              </g>
+              <g>
+                <g>
+                  <path d="M153.6,170.667h-11.378c-6.283,0-11.378,5.094-11.378,11.378V204.8c0,6.283,5.094,11.378,11.378,11.378H153.6    c6.283,0,11.378-5.094,11.378-11.378v-22.756C164.978,175.761,159.883,170.667,153.6,170.667z"/>
+                </g>
+              </g>
+              <g>
+                <g>
+                  <path d="M153.6,273.067h-11.378c-6.283,0-11.378,5.094-11.378,11.378V307.2c0,6.283,5.094,11.378,11.378,11.378H153.6    c6.283,0,11.378-5.094,11.378-11.378v-22.756C164.978,278.161,159.883,273.067,153.6,273.067z"/>
+                </g>
+              </g>
+              <g>
+                <g>
+                  <path d="M153.6,375.467h-11.378c-6.283,0-11.378,5.094-11.378,11.378V409.6c0,6.283,5.094,11.378,11.378,11.378H153.6    c6.283,0,11.378-5.094,11.378-11.378v-22.756C164.978,380.561,159.883,375.467,153.6,375.467z"/>
+                </g>
+              </g>
+              <g>
+                <g>
+                  <rect x="199.111" y="182.044" width="182.044" height="22.756"/>
+                </g>
+              </g>
+              <g>
+                <g>
+                  <rect x="199.111" y="284.444" width="182.044" height="22.756"/>
+                </g>
+              </g>
+              <g>
+                <g>
+                  <rect x="199.111" y="386.844" width="182.044" height="22.756"/>
+                </g>
+              </g>
+              </svg>
+               Records
             </button>
             <button class="nav-button" onclick={(e) => {pageData.currentPageIndex = 3}} class:active={pageData.currentPageIndex === 3}>
                 <svg class="nav-icon" viewBox="0 0 24 24">

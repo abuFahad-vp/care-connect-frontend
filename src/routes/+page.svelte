@@ -3,7 +3,6 @@
     import Background from './Background.svelte';
     import Navigation from './navigation.svelte';
     import { get_server_ip, login, user_data } from './user.svelte';
-    import { InspectIcon } from 'lucide-svelte';
 
     let showPassword = $state(false);
     let error_msg = $state("");

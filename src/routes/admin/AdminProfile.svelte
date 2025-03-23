@@ -12,6 +12,7 @@
     <div>
             <Button onclick={
               async (e: any) => {
+                goto("/")
                 service_requests.requests = [];
                 pageData.currentPageIndex = 0;
 
@@ -29,6 +30,7 @@
                       email: '',
                       password: '',
                       confirm_password: '',
+                      institution: '',
                       dob: '',
                       contact_number: '',
                       location: '',
@@ -36,7 +38,6 @@
                       bio: '',
                       profile_image: "",
                 }
-                goto("/")
               }
             }>logout</Button>
     </div>

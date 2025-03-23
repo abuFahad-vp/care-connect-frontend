@@ -69,6 +69,10 @@ export async function login(email: string, password: string, redirect: string, p
       user_data.data = data.data;
       user_data.serverURL = `http://${user_data.serverIP}:8000`;
 
+      if (redirect === "/admin") {
+        user_data.data.user_type = "admin";
+      }
+
       if (!data.data.approve) {
         console.error("Volunteer is not approved.");
         return_response.result = false;

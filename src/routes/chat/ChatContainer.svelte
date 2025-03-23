@@ -69,7 +69,7 @@
             return;
         }
         let new_message: ChatMessageTemp = {
-                id: messages.length + "",
+                id: messages.length + 1 + "",
                 service_id: chatData.service_id,
                 content: content,
                 sender: user_data.data.email,
