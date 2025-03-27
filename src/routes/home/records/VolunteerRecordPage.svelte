@@ -14,10 +14,10 @@
     let showUpdatedModal = $state(false);
     let isShowChat = $state(false);
     let updateMsg = $state("");
-    let updateColor = $state("green")
+    let updateColor = $state("green");
+    let formErrors = $state<{[key: string]: string}>({});
 
     onMount(() => {
-
         const inputsAndTextareas = document.querySelectorAll('input, textarea');
 
         inputsAndTextareas.forEach(element => {
@@ -41,52 +41,123 @@
             value: "",
             remarks: "",
             unit: "kg",
+            type: "number",
+            min: 0,
+            max: 500
         },
         {
             title: "Height",
             value: "",
             remarks: "",
             unit: "cm",
+            type: "number",
+            min: 0,
+            max: 300
         },
         {
             title: "Blood pressure",
             value: "",
             remarks: "",
-            unit: "mmHg"
+            unit: "mmHg",
+            type: "bp"
         },
         {
             title: "Heart rate",
             value: "",
             remarks: "",
-            unit: "bpm"
+            unit: "bpm",
+            type: "number",
+            min: 0,
+            max: 250
         },
         {
             title: "Body temperature",
             value: "",
             remarks: "",
-            unit: "°F"
+            unit: "°F",
+            type: "number",
+            min: 90,
+            max: 110
         },
         {
             title: "Oxygen saturation",
             value: "",
             remarks: "",
-            unit: "SpO₂%"
+            unit: "SpO₂%",
+            type: "number",
+            min: 0,
+            max: 100
         },
         {
             title: "Blood glucose",
             value: "",
             remarks: "",
-            unit: "mg/dL"
+            unit: "mg/dL",
+            type: "number",
+            min: 0,
+            max: 600
         },
         {
             title: "Respiratory rate",
             value: "",
             remarks: "",
-            unit: "breaths per minute"
+            unit: "breaths per minute",
+            type: "number",
+            min: 0,
+            max: 60
         },
     ]);
 
+    function validateField(field: recordForm): string | null {
+        // Skip validation for empty fields (optional fields)
+        if (!field.value) return null;
+
+        // Validate numerical fields
+        if (field.type === 'number') {
+            const numValue = parseFloat(field.value);
+            if (isNaN(numValue)) {
+                return `${field.title} must be a valid number`;
+            }
+            if (field.min !== undefined && numValue < field.min) {
+                return `${field.title} must be at least ${field.min} ${field.unit}`;
+            }
+            if (field.max !== undefined && numValue > field.max) {
+                return `${field.title} must be no more than ${field.max} ${field.unit}`;
+            }
+        }
+
+        // Special validation for blood pressure
+        if (field.type === 'bp') {
+            const bpPattern = /^(\d+)\/(\d+)$/;
+            if (!bpPattern.test(field.value)) {
+                return 'Blood pressure must be in format "systolic/diastolic" (e.g., 120/80)';
+            }
+            const [systolic, diastolic] = field.value.split('/').map(parseFloat);
+            if (systolic < 50 || systolic > 250 || diastolic < 30 || diastolic > 150) {
+                return 'Invalid blood pressure values';
+            }
+        }
+
+        return null;
+    }
+
+    function validateForm(): boolean {
+        formErrors = {};
+        let isValid = true;
+
+        record_form.forEach(field => {
+            const error = validateField(field);
+            if (error) {
+                formErrors[field.title] = error;
+                isValid = false;
+            }
+        });
+
+        return isValid;
+    }
+
     let previous_form = JSON.stringify(record_form);
+
     try {
       user_data.websocket.addListener((msg) => {
           if (msg.type == "Text") {
@@ -105,11 +176,19 @@
 
     async function updateRecord() {
         try {
+            // Validate form before submission
+            if (!validateForm()) {
+                showUpdatedModal = true;
+                updateColor = "red";
+                updateMsg = "Please correct the errors in the form";
+                return;
+            }
+
             if (JSON.stringify(record_form) === previous_form) {
                 showUpdatedModal = true;
-                updateColor = "red"
+                updateColor = "red";
                 updateMsg = "Nothing to update!!!"
-                return
+                return;
             }
             let formData = new FormData();
             formData.append("data", JSON.stringify(record_form));
@@ -123,24 +202,25 @@
             });
             if (response.ok) {
                 showUpdatedModal = true;
-                updateColor = "green"
-                updateMsg = "Record successfully updated"
+                updateColor = "green";
+                updateMsg = "Record successfully updated";
                 previous_form = JSON.stringify(record_form);
+                formErrors = {}; // Clear any previous errors
                 console.log("DONE");
             }else if (response.status === 401 ) {
                 showUpdatedModal = true;
-                updateColor = "orange"
+                updateColor = "orange";
                 updateMsg = "Wait for a couple of seconds.";
                 console.log("Wait for a couple of seconds.");
             } else {
                 showUpdatedModal = true;
-                updateColor = "red"
+                updateColor = "red";
                 updateMsg = "Failed to update the record";
                 console.log("Failed to update the record");
             }
         } catch (e: any) {
             showUpdatedModal = true;
-            updateColor = "red"
+            updateColor = "red";
             updateMsg = "Failed to update the record";
             console.log("Error: ", e);
         }
@@ -218,10 +298,21 @@
                 {#each record_form as field (field.title)}
                     <Label>{`${field.title} (${field.unit})`}</Label>
                     <div style="margin: 5px;">
-                        <Input type="text" placeholder={`Enter the ${field.title}`} bind:value={field.value}></Input>
+                        <Input 
+                            type="text" 
+                            placeholder={`Enter the ${field.title}`} 
+                            bind:value={field.value}
+                        ></Input>
+                        {#if formErrors[field.title]}
+                            <p style="color: red; font-size: 0.8rem;">{formErrors[field.title]}</p>
+                        {/if}
                     </div>
                     <div style="margin: 5px; margin-bottom: 10px">
-                        <Input type="text" placeholder={`Enter the remarks on ${field.title}`} bind:value={field.remarks}></Input>
+                        <Input 
+                            type="text" 
+                            placeholder={`Enter the remarks on ${field.title}`} 
+                            bind:value={field.remarks}
+                        ></Input>
                     </div>
                 {/each}
                 {#if showUpdatedModal}
