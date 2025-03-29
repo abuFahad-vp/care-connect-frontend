@@ -15,18 +15,14 @@
       showPassword = !showPassword;
     };
 
-    onMount(async () => {
-      if (user_data.serverIP === "") {
-        let count = 0;
-        while (user_data.serverIP === "" && count < 5) {
-          await get_server_ip(ping_timeout);
-          count += 1;
-        }
-      }
+    async function onsubmit(e: SubmitEvent) {
+      isLoading = true;
+      error_msg = "";
+      const formData = new FormData(e.target as HTMLFormElement);
+      let username = formData.get("username") as string;
+      let password = formData.get("password") as string;
 
-      if (user_data.serverIP === "") {
-        error_msg = "Failed to find the IP of server.";
-      }
+      let redirect = "";
 
       try {
         const signup_url = `http://${user_data.serverIP}:8000/user/get_institutions`;
@@ -40,16 +36,6 @@
       } catch (e) {
         console.log("ERROR: ", e)
       }
-    });
-
-    async function onsubmit(e: SubmitEvent) {
-      isLoading = true;
-      error_msg = "";
-      const formData = new FormData(e.target as HTMLFormElement);
-      let username = formData.get("username") as string;
-      let password = formData.get("password") as string;
-
-      let redirect = "";
 
       for (let email in institutions) {
         if (username === email) {
