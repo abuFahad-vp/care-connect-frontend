@@ -12,6 +12,7 @@
     let showProfile = $state(false);
     let record_form = $state([] as recordForm[]);
     let isShowChat = $state(false);
+    let showSpinner = $state(true);
 
     user_data.websocket.addListener(async (msg) => {
         if (msg.type === "Text") {
@@ -55,15 +56,21 @@
     }
 
     async function startVolunteerRequest() {
+        
+        showSpinner = true;
+
         let response = await fetch(`${user_data.serverURL}/elder/new_volunteer_request`, {
             method: 'POST',
-			headers: {
-				'Authorization': `Bearer ${user_data.sessionToken}`
-			},
+            headers: {
+              'Authorization': `Bearer ${user_data.sessionToken}`
+            },
         })
+
         let responseData = await response.json() as any;
         console.log(response)
         console.log(responseData)
+
+        setTimeout(function(){showSpinner = false}, 3000);
 
         while (true) {
             response = await fetch(`${user_data.serverURL}/elder/find_assign_volunteer/5`, {
@@ -72,12 +79,15 @@
                     'Authorization': `Bearer ${user_data.sessionToken}`
                 }
             });
+
             if (await getPartner() === true) {
                 return
             }
+
             responseData = await response.json() as any;
             console.log(response)
             console.log(responseData)
+
             await sleep(1000);
         }
     }
@@ -155,10 +165,14 @@
         </div>
     {:else if record_contract.is_requesting}
         <div class="request-loading">
-            <h2>Requesting...</h2>
-            <div class="spinner">
-                <LoadingSpinner size=2rem/>
-            </div>
+            {#if showSpinner}
+              <h2>Requesting...</h2>
+              <div class="spinner">
+                  <LoadingSpinner size=2rem/>
+              </div>
+            {:else}
+              <h2>Request Sent.</h2>
+            {/if}
         </div>
     {:else}
         <div class="request-button">
