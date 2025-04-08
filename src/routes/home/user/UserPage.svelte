@@ -7,8 +7,9 @@
     import { record_contract } from "../records/recordData.svelte";
     import { pageData } from "../page_state.svelte";
     import { service_requests } from "../services/elder/service_data.svelte";
-    import { Tabs, TabItem } from 'flowbite-svelte';
+    import { Tabs, TabItem, Button } from 'flowbite-svelte';
     import TaskRecords from "../../admin/TaskRecords.svelte";
+    import UpdateModal from "./UpdateModal.svelte";
 </script>
 
 <main class="main-container">
@@ -16,10 +17,13 @@
       <TabItem open title="Profile">
         <div class="user-profile">
             <ProfileView formData={user_data.data}/>
+            <div style="padding-bottom: 2rem;">
+              <UpdateModal />
+            </div>
             <div class="logout">
                 <OpenDoorSolid />
                 <button onclick={
-                  async (e) => {
+                  async (_e) => {
                     service_requests.requests = [];
                     pageData.serviceRequestsArray = [];
                     pageData.currentPageIndex = 0;
