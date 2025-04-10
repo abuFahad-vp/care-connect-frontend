@@ -135,7 +135,6 @@
       });
 
       if (response.ok) {
-        const data = await response.json();
         success_msg = "Profile updated successfully!";
         await get_me();
 
@@ -202,6 +201,7 @@
         </div>
         
         <div class="modal-body">
+          {#if user_data.data.user_type !== "volunteer"}
           <div class="form-group">
             <label for="full_name">Full Name</label>
             <input 
@@ -212,6 +212,7 @@
               placeholder="Enter your full name" 
             />
           </div>
+          {/if}
 
           <div class="form-group">
             <label for="contact_number">Contact number with country code</label>
@@ -238,6 +239,7 @@
             </div>
           </div>
 
+          {#if user_data.data.user_type !== "volunteer"}
           <div class="form-group">
             <label for="profile_image">Profile Image</label>
             <input 
@@ -248,6 +250,7 @@
             />
             <small>Max size: 500KB. Supported formats: JPG, PNG</small>
           </div>
+          {/if}
 
           <div class="form-group">
             <label for="bio">Bio</label>
