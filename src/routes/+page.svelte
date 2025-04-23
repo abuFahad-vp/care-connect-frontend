@@ -25,6 +25,9 @@
       let redirect = "";
 
       try {
+        if (user_data.serverIP == "") {
+          await get_server_ip();
+        }
         const signup_url = `http://${user_data.serverIP}:8000/user/get_institutions`;
         const response = await fetch(signup_url, { method: "GET"});
 

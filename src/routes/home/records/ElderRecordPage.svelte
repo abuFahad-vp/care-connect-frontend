@@ -161,6 +161,7 @@
                     </div>
                 {/each}
                 <ReportModal modal_header="Feedback" button_name="Feedback" page="100%" fn={submitFeedback} color="primary" size="xs"/>
+                <div style="padding-bottom: 20px;"></div>
             </form>
         </div>
     {:else if record_contract.is_requesting}

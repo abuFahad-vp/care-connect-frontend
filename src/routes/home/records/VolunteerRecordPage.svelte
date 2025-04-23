@@ -163,10 +163,24 @@
           if (msg.type == "Text") {
               const incomingData = JSON.parse(msg.data)
               if (incomingData.type === "new_volunteer_request") {
+
                   const requestEmail = incomingData.elder_profile.email;
                   newRequestProfile = incomingData.elder_profile;
+                  newRequestProfile["service_id"] = incomingData.service_id;
                   isNewRequest = true;
-                  console.log(`New volunteer request received: ${requestEmail}`);
+
+                  let timeoutDuration = incomingData.timeout * 1000;
+                  let requestTimeoutId = setTimeout(() => {
+                    console.log(`Request timout reached for ${requestEmail}`);
+                    newRequestProfile = {};
+                    isNewRequest = false;
+
+                    if (!record_contract.is_assigned) {
+                      injectAlert("Request expired due to timeout");
+                    }
+                  }, timeoutDuration);
+
+                  console.log(`New volunteer request received: ${requestEmail}: ${incomingData.timeout}`);
               }
           }
       })
@@ -187,7 +201,7 @@
             if (JSON.stringify(record_form) === previous_form) {
                 showUpdatedModal = true;
                 updateColor = "red";
-                updateMsg = "Nothing to update!!!"
+                updateMsg = "Nothing to update!"
                 return;
             }
             let formData = new FormData();
@@ -226,16 +240,32 @@
         }
     }
 
-    function acceptRequest() {
-        let decision = `new_volunteer_request:accept:${newRequestProfile.email}`
-        const jsonResponse = {
-            type: decision
+    async function acceptRequest() {
+      try {
+        let response = await fetch(`${user_data.serverURL}/volunteer/can_assign/${newRequestProfile.email}`, {
+            method: "GET",
+        });
+
+        if (response.ok) {
+          let decision = `new_volunteer_request:accept:${newRequestProfile.email}:${newRequestProfile.service_id}`
+          const jsonResponse = {
+              type: decision
+          }
+
+          user_data.websocket.send(JSON.stringify(jsonResponse));
+          console.log(`Response sent for request ${newRequestProfile.email}: ${decision}`);
+          record_contract.partner_profile = newRequestProfile;
+          record_contract.is_assigned = true;
+          isNewRequest = false;
+        } else {
+          injectAlert("Already Assigned!");
+          newRequestProfile = {}
+          isNewRequest = false;
         }
-        user_data.websocket.send(JSON.stringify(jsonResponse));
-        console.log(`Response sent for request ${newRequestProfile.email}: ${decision}`);
-        record_contract.partner_profile = newRequestProfile;
-        record_contract.is_assigned = true;
-        isNewRequest = false;
+      } catch (e) {
+        console.log("ERROR: ", e);
+        injectAlert("Request failed!");
+      }
     }
 
     function rejectRequest() {
@@ -255,10 +285,54 @@
         } else {
             return `Failed to report the ${record_contract.partner_profile.user_type}`
         }
+    }  
+    // Function to create and inject alert using DOM manipulation
+
+    function injectAlert(message = "Already Assigned!") {
+        // Get the container
+        const container = document.getElementById('alert-container');
+        
+        container.innerHTML = '';
+        
+        // Create a div to hold our alert
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'flowbite-alert mb-4';
+        
+        // Set the HTML content for the alert
+        alertDiv.innerHTML = `
+            <div class="flex items-center p-4 text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
+                <svg class="flex-shrink-0 w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm.5 12a1 1 0 0 1-1-1v-6a1 1 0 0 1 2 0v6a1 1 0 0 1-1 1Z"/>
+                </svg>
+                <div class="ml-3 text-sm font-medium">
+                    ${message}
+                </div>
+                <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-red-50 text-red-500 rounded-lg focus:ring-2 focus:ring-red-400 p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-gray-700" 
+                        onclick="this.parentElement.remove()">
+                    <span class="sr-only">Close</span>
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                </button>
+            </div>
+        `;
+        
+        // Insert the alert at the beginning of the container
+        container?.insertBefore(alertDiv, container.firstChild);
+        
+        // Optionally auto-remove after some time
+        setTimeout(() => {
+            if (alertDiv && alertDiv.parentNode) {
+                alertDiv.remove();
+            }
+        }, 5000); // Remove after 5 seconds
     }
 </script>
 
 <main class="main-container">
+    {#if !record_contract.is_assigned}
+      <div id="alert-container"></div>
+    {/if}
     {#if record_contract.is_assigned}
         <div class="profile-view">
             {#if showProfile}

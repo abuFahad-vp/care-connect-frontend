@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { slide } from 'svelte/transition';
+	  import { slide } from 'svelte/transition';
     import { service_requests, type service_form } from './service_data.svelte';
     import LoadingButton from '../../../LoadingButton.svelte';
     import { user_data } from '../../../user.svelte';
@@ -13,6 +13,7 @@
     import ProfileViewModal from '../../ProfileViewModal.svelte';
     import ReportModal from '../../../ReportModal.svelte';
     import ChatWindow from '../../../chat/ChatWindow.svelte';
+    import parsePhoneNumberFromString from 'libphonenumber-js';
 
     let { formData, id }: {
 		formData: service_form
@@ -150,20 +151,35 @@
         return differenceMs;
     }
 
+    function validatePhone() {
+        try {
+            const parsedNumber = parsePhoneNumberFromString(formData.contact_number)
+            return parsedNumber ? parsedNumber.isValid() : false;
+        } catch (error) {
+            return false;
+        }
+    }
+
     async function handleSubmit(event: Event) {
+
+		    event.preventDefault()
+
+        if (!validatePhone()) {
+          formData.error_msg = "Invalid Phone number"
+          return
+        }
 
         formData.isSubmitting = true;
         formData.error_msg = "";
-		event.preventDefault()
 
         formData.timeout = formData.time_period_to;
         const differenceSeconds = Math.floor(getTimeDifference(formData.timeout) / 1000);
         // console.log(`Difference: ${differenceSeconds}`);
 
-		let new_locations = formData.locations_input.map(({address, description}) => `${address}|${description}`)
-		// console.log("new locations", new_locations);
-		// console.log("Docs", $state.snapshot(formData.documents));
-		let has_documents = formData.documents.length > 0;
+        let new_locations = formData.locations_input.map(({address, description}) => `${address}|${description}`)
+        // console.log("new locations", new_locations);
+        // console.log("Docs", $state.snapshot(formData.documents));
+        let has_documents = formData.documents.length > 0;
 
         const requestData: service_form = {
             partner_profile: {},
@@ -179,9 +195,9 @@
             time_period_to: formData.time_period_to,
             contact_number: formData.contact_number,
             locations: [`${formData.my_location}|Elder's location`, ...new_locations],
-			documents: formData.documents,
-			expanded: false,
-			my_location: "",
+            documents: formData.documents,
+            expanded: false,
+            my_location: "",
             isSubmitting: formData.isSubmitting,
             isAccepted: formData.isAccepted,
             service_id: formData.service_id,
@@ -196,72 +212,73 @@
 		// console.log("lenghth = ", requestData.documents.length);
 		try {
         	const response = await createServiceRequest(requestData);
-            const responseData = await response.json() as any;
+          const responseData = await response.json() as any;
 
-            console.log("service request response:", responseData);
+          console.log("service request response:", responseData);
 
-            if (!response.ok) {
-                throw new Error(responseData.detail);
-            }
+          if (!response.ok) {
+              throw new Error(responseData.detail);
+          }
 
-            if (responseData.status === "pending") {
-                formData.service_id = responseData.service_id;
-                console.log("request sended:", formData.service_id);
-            }
+          if (responseData.status === "pending") {
+              formData.service_id = responseData.service_id;
+              console.log("request sended:", formData.service_id);
+          }
 
-            // if (responseData.status === "failed") {
-            //     throw new Error("No volunteer accepted the request");
-            // }
+          // if (responseData.status === "failed") {
+          //     throw new Error("No volunteer accepted the request");
+          // }
 
-            // if (responseData.status === "accepted") {
-            //     formData.isAccepted = true;
-            //     formData.service_id = responseData.service_id;
-            //     remainingTime = getTimeDifference(formData.time_period_to, formData.time_period_from);
-            //     console.log("remaining time", remainingTime)
-            //     startTime();
-            //     return responseData
-            // }
-            // formData.error_msg = "You can't be here";
-            return responseData;
+          // if (responseData.status === "accepted") {
+          //     formData.isAccepted = true;
+          //     formData.service_id = responseData.service_id;
+          //     remainingTime = getTimeDifference(formData.time_period_to, formData.time_period_from);
+          //     console.log("remaining time", remainingTime)
+          //     startTime();
+          //     return responseData
+          // }
+          // formData.error_msg = "You can't be here";
+          return responseData;
 
-        } catch (error: any) {
-            formData.isSubmitting = false;
-            console.log(error);
-			formData.error_msg = error.message;
-        }
+      } catch (error: any) {
+          formData.isSubmitting = false;
+          console.log(error);
+          formData.error_msg = error.message;
+      }
 	}
 
     async function createServiceRequest(requestData: service_form): Promise<any> {
 
         const formData = new FormData();
 
-		requestData.locations.forEach(location => {
-			formData.append('locations', location);
-		});
+        requestData.locations.forEach(location => {
+          formData.append('locations', location);
+        });
 
-		requestData.documents.forEach(files => {
-			formData.append('documents', files);
-		});
-		console.log("Server URL => ", user_data.serverIP);
-    const timeout_end = requestData.time_period_to.replace('T', ' ');
-    const url = new URL(`http://${user_data.serverIP}:8000/elder/new_service_request/${timeout_end}/${isUrgent}`);
+        requestData.documents.forEach(files => {
+          formData.append('documents', files);
+        });
 
-		url.searchParams.append('description', requestData.description);
-		url.searchParams.append('has_documents', requestData.has_documents.toString());
-		url.searchParams.append('time_period_from', requestData.time_period_from);
-		url.searchParams.append('time_period_to', requestData.time_period_to);
-		url.searchParams.append('contact_number', requestData.contact_number);
+        console.log("Server URL => ", user_data.serverIP);
+        const timeout_end = requestData.time_period_to.replace('T', ' ');
+        const url = new URL(`http://${user_data.serverIP}:8000/elder/new_service_request/${timeout_end}/${isUrgent}`);
 
-		const response = await fetch(url.toString(), {
-			method: 'POST',
-			headers: {
-				'accept': 'application/json',
-				'Authorization': `Bearer ${user_data.sessionToken}`
-			},
-			body: formData
-		});
-		return response;
-	}
+        url.searchParams.append('description', requestData.description);
+        url.searchParams.append('has_documents', requestData.has_documents.toString());
+        url.searchParams.append('time_period_from', requestData.time_period_from);
+        url.searchParams.append('time_period_to', requestData.time_period_to);
+        url.searchParams.append('contact_number', requestData.contact_number);
+
+      const response = await fetch(url.toString(), {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'Authorization': `Bearer ${user_data.sessionToken}`
+        },
+        body: formData
+      });
+      return response;
+    }
 
     function abortRequest() {
         const jsonResponse = {
@@ -280,6 +297,15 @@
             return "Successfully reported the volunteer";
         }
         return "Failed to report the volunteer";
+    }
+
+    async function abortMsg(msg: string): Promise<string> {
+        let status = await reportUser(msg, formData.partner_profile.email, "Service Abort Message");
+        if (status) {
+            abortRequest();
+            return "Successfully sent the message";
+        }
+        return "Failed to sent the message";
     }
 </script>
 
@@ -529,14 +555,15 @@
                             {/if}
                         </div>
                         <div class="form-actions">
-                            <Button 
+                            <!-- <Button 
                                 size="sm"
                                 color="red"
                                 type="button" 
                                 onclick={() => {abortModal = true}}
                             >
                                 Abort
-                        </Button>
+                        </Button> -->
+                            <ReportModal button_name="Abort" modal_header="Abort" page="0%" fn={abortMsg} color="red" size="md"/>
                         <ReportModal button_name="Report" modal_header="Report" page="0%" fn={reportPartner} color="dark" size="sm"/>
                         </div>
                     {/if}

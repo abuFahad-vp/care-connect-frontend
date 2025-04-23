@@ -124,6 +124,15 @@
         }
         return "Failed to report the elder";
     }
+
+    async function abortMsg(msg: string): Promise<string> {
+        let status = await reportUser(msg, partner_profile.email, "Service Abort Message");
+        if (status) {
+            onAbort();
+            return "Successfully sent the message";
+        }
+        return "Failed to sent the message";
+    }
 </script>
 
 <div 
@@ -268,7 +277,8 @@
                         {/if}
                         <div style="display:flex; gap: 3px">
                             <ReportModal button_name="Report" modal_header="Report" page="0%" fn={reportPartner} color="dark" size="md"/>
-                            <Button color="red" onclick={() => {abortModal = true}}>Abort</Button>
+                            <ReportModal button_name="Abort" modal_header="Abort" page="0%" fn={abortMsg} color="red" size="md"/>
+                            <!-- <Button color="red" onclick={() => {abortModal = true}}>Abort</Button> -->
                             <Button color="green" onclick={() => {finishModal = true}}>Finish</Button>
                         </div>
                     </div>
