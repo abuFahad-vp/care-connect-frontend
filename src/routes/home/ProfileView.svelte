@@ -1,21 +1,22 @@
 <script>
-    import { Button } from "flowbite-svelte";
-import { displayImage } from "./util.svelte";
-
-    let {formData} = $props();
+  import { displayImage } from "./util.svelte";
+  let {formData} = $props();
 </script>
 
 <div class="profile-container">
     <div class="profile-header">
         <img src={displayImage(formData.profile_image)} alt="ProfileImage" class="profile-image" />
         <h2>{formData.full_name}</h2>
+        
         <p class="bio">{formData.bio}</p>
     </div>
     <div class="profile-details">
         <p><strong>Email:</strong> {formData.email}</p>
         <p><strong>User Type:</strong> {formData.user_type}</p>
-        {#if formData.user_type === "volunteer"}
+        {#if formData.user_type !== "elder"}
           <p><strong>Institution:</strong> {formData.institution}</p>
+        {/if}
+        {#if formData.user_type === "volunteer"}
           <p><strong>Institution Id:</strong> {formData.institution_id}</p>
         {/if}
         <p><strong>Age:</strong> {new Date().getFullYear() - 1 - formData.dob.slice(0,4)}</p>

@@ -5,11 +5,14 @@
     import { user_data } from "../user.svelte";
     import { pageData } from "./page_state.svelte";
     import { service_requests } from "../home/services/elder/service_data.svelte";
+    import ProfileView from "../home/ProfileView.svelte";
 
 
 </script>
 <main class="main-container">
-    <div>
+    <div class="profile-view">
+            <ProfileView formData={user_data.data}/>
+          <div class="logout-button">
             <Button onclick={
               async (e: any) => {
                 service_requests.requests = [];
@@ -44,6 +47,7 @@
                 goto("/")
               }
             }>logout</Button>
+      </div>
     </div>
 </main>
 
@@ -71,5 +75,18 @@
         .main-container {
             height: 73vh;
         }
+    }
+
+    .profile-view {
+      display: flex;
+      flex-direction: column;
+      background-color: white;
+      padding-bottom: 1rem;
+      border-radius: 1rem;
+    }
+
+    .logout-button {
+      display: flex;
+      justify-content: center;
     }
 </style>
