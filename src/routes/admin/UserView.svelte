@@ -5,6 +5,7 @@
     import Fuse from 'fuse.js';
     import { pageData } from "./page_state.svelte";
     import { user_data } from "../user.svelte";
+    import Page from "../+page.svelte";
 
     let users = $state([] as any[]);
     let institutions = $state({});
@@ -59,6 +60,12 @@
         }
         
         return filteredUsers.filter(user => {
+            if (pageData.showUnapproved && !user.approve) {
+              return true;
+            }
+            if (pageData.showUnapproved) {
+              return false;
+            }
             if (!pageData.showVolunteer && !pageData.showElder) {
                 return false;
             }
@@ -137,6 +144,16 @@
           bind:checked={pageData.showElder} 
           id="elder" 
           name="elder"
+          class="w-4 h-4 accent-indigo-600 rounded focus:ring-2 focus:ring-indigo-500"
+      >
+    </div>
+    <div class="flex items-center space-x-2 mb-3">
+      <label for="unapproved" class="text-sm font-medium cursor-pointer text-gray-700">Show Unapproved</label>
+      <input 
+          type="checkbox" 
+          bind:checked={pageData.showUnapproved} 
+          id="unapproved" 
+          name="unapproved"
           class="w-4 h-4 accent-indigo-600 rounded focus:ring-2 focus:ring-indigo-500"
       >
     </div>
